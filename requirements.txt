@@ -1,5 +1,7 @@
-autopep8==2.0.0
 MarkupSafe==2.1.1
+mypy==0.991
+mypy-extensions==0.4.3
 pycodestyle==2.9.1
 tomli==2.0.1
+typing_extensions==4.4.0
 Werkzeug==2.2.2
