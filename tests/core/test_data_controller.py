@@ -1,5 +1,6 @@
-from data_server.errors import ItemNotFoundError
 import unittest
+from copy import deepcopy
+from data_server.errors import ItemNotFoundError
 from data_server.core.data_controller import DataController
 from tests.fake_data import data_sample_with_empty_posts, data_sample_with_int_ids, data_sample_with_string_ids, \
     data_sample_with_id_name_as_uuid, data_sample_with_nested_items, data_sample
@@ -94,6 +95,79 @@ class TestGetItems(unittest.TestCase):
             controller.get_item(["posts", "comments", "self"], 1)
         with self.assertRaises(ItemNotFoundError):
             controller.get_item(["posts", "comment", "all"], 1)
+
+
+class TestDeleteItem(unittest.TestCase):
+    def test_delete_item_with_correct_id(self):
+        data = deepcopy(data_sample)
+        controller = DataController(data)
+        controller.delete_item(["books"], 1)
+        self.assertEqual(len(data_sample["books"]) - 1, len(data["books"]))
+        self.assertEqual(len([item for item in data["books"] if item["id"] == 1]), 0)
+        controller.delete_item(["books"], 2)
+        self.assertEqual(len(data_sample["books"]) - 2, len(data["books"]))
+        self.assertEqual(len([item for item in data["books"] if item["id"] == 2]), 0)
+
+    def test_delete_item_with_correct_path_but_nonexisting_id(self):
+        data = deepcopy(data_sample)
+        controller = DataController(data)
+        with self.assertRaises(ItemNotFoundError):
+            controller.delete_item(["books"], 3000)
+        # make sure nothing is deleted
+        self.assertEqual(len(data_sample), len(data))
+
+    def test_delete_item_with_wrong_path(self):
+        data = deepcopy(data_sample)
+        controller = DataController(data)
+        with self.assertRaises(ItemNotFoundError):
+            controller.delete_item(["path"], 1)
+        # make sure nothing is deleted
+        self.assertEqual(len(data_sample), len(data))
+
+
+class TestAddItem(unittest.TestCase):
+    def test_add_item_with_autogenerate_id(self):
+        pass
+
+    def test_add_item_with_timestamps(self):
+        pass
+
+    def test_add_item_with_no_timestamps(self):
+        pass
+
+    def test_add_item_with_existing_id(self):
+        pass
+
+    def test_add_item_with_no_existing_id(self):
+        pass
+
+
+class TestPatchItem(unittest.TestCase):
+    def test_patch_item_with_correct_id(self):
+        pass
+
+    def test_patch_item_with_correct_path_but_nonexisting(self):
+        pass
+
+    def test_patch_item_with_wrong_path(self):
+        pass
+
+    def test_patch_item_with_teimstamps(self):
+        pass
+
+
+class TestReplaceItem(unittest.TestCase):
+    def test_replace_item_with_correct_id(self):
+        pass
+
+    def test_replace_item_with_teimstamps(self):
+        pass
+
+    def test_replace_item_with_correct_path_but_nonexisting(self):
+        pass
+
+    def test_replace_item_with_wrong_path(self):
+        pass
 
 
 if __name__ == "__main__":

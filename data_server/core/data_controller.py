@@ -4,7 +4,7 @@ from functools import reduce
 from datetime import datetime
 from uuid import uuid4
 
-from data_server.errors import ItemNotFoundError
+from data_server.errors import ItemNotFoundError, DuplicateIDFound
 
 JSONItem = Dict[Text, Any]
 JSONItems = List[JSONItem]
@@ -80,6 +80,9 @@ class DataController:
         assert isinstance(
             items, list), f"Expected value for {path!r} to be a list, got {items} instead"
         data = new_data.copy()
+        if not self.auto_generate_id and self.id_name in data:
+            if [item for item in items if item[self.id_name] == data[self.id_name]]:
+                raise DuplicateIDFound(f"an item exists with same id {data[self.id_name]}")
         if self.auto_generate_id and self.id_name not in data:
             data[self.id_name] = self._autogenerate_id(len(items))
         data = self._add_timestamps(data)
