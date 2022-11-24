@@ -1,6 +1,6 @@
-from typing import Final
+from data_server.core.data_controller import JSONItem
 
-data_sample: Final = {
+data_sample: JSONItem = {
     "books": [
         {
             "id": 12, "author": "Mark Mason", "title": "Professional Python"
@@ -25,22 +25,22 @@ data_sample: Final = {
         },
     ]
 }
-data_sample_with_empty_posts: Final = {"posts": []}
+data_sample_with_empty_posts: JSONItem = {"posts": []}
 
-data_sample_with_int_ids: Final = {"posts": [{"id": 1, "name": "Kobby Owen", "age": 24}]}
+data_sample_with_int_ids: JSONItem = {"posts": [{"id": 1, "name": "Kobby Owen", "age": 24}]}
 
-data_sample_with_string_ids: Final = {
+data_sample_with_string_ids: JSONItem = {
     "posts": [{"id": "d10b6bd7-8040-4f84-b744-bc405d4101ac", "name": "Kobby Owen", "age": 24}]}
 
-data_sample_with_timestamps: Final = {
+data_sample_with_timestamps: JSONItem = {
     "posts": [{"id": 1, "name": "Kobby Owen", "age": 24,
                "created_at": "2022-11-24T09:51:56.726362", "updated_at": None}]}
 
-data_sample_with_id_name_as_uuid: Final = {
+data_sample_with_id_name_as_uuid: JSONItem = {
     "posts": [{"uuid": 1, "name": "Kobby Owen", "age": 24,
                "created_at": "2022-11-24T09:51:56.726362", "updated_at": None}]}
 
-data_sample_with_nested_items: Final = {
+data_sample_with_nested_items: JSONItem = {
     "posts": {
         "comments": {
             "all": [
