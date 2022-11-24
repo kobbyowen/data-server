@@ -21,7 +21,7 @@ class DataController:
                  sort_key_param_name: Text = "sort_key", order_param_name: Text = "order",
                  page_param_name: Text = "page", size_param_name: Text = "size",
                  default_page_size: int = 10, autogenerate_id: bool = False, use_timestamps: bool = False,
-                 created_at_key_name: Text = "created_at", updated_at_key_name: Text = "updated_at"):
+                 created_at_key_name: bool = "created_at", updated_at_key_name: Text = "updated_at"):
         self.data = data
         self.id_name = id_name
         self.sort_key_param_name = sort_key_param_name
