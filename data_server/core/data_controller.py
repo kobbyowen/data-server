@@ -21,7 +21,7 @@ class DataController:
                  sort_key_param_name: Text = "sort_key", order_param_name: Text = "order",
                  page_param_name: Text = "page", size_param_name: Text = "size",
                  default_page_size: int = 10, autogenerate_id: bool = False, use_timestamps: bool = False,
-                 created_at_key_name: bool = "created_at", updated_at_key_name: Text = "updated_at"):
+                 created_at_key_name: Text = "created_at", updated_at_key_name: Text = "updated_at"):
         self.data = data
         self.id_name = id_name
         self.sort_key_param_name = sort_key_param_name
@@ -40,7 +40,7 @@ class DataController:
             self.order_param_name, SortOrder.ASC.value)
         self.order = SortOrder.ASC if self.order.lower(
         ) == SortOrder.ASC.value else SortOrder.DESC
-        self.page = filters.pop(self.page_param_name, 0)
+        self.page = filters.pop(self.page_param_name, 0) s
         self.size = filters.pop(self.page_param_name, self.default_page_size)
         new_data = self._filter_items(data, **filters)
         new_data.sort(
