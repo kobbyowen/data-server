@@ -40,7 +40,7 @@ class DataController:
             self.order_param_name, SortOrder.ASC.value)
         self.order = SortOrder.ASC if self.order.lower(
         ) == SortOrder.ASC.value else SortOrder.DESC
-        self.page = filters.pop(self.page_param_name, 0) s
+        self.page = filters.pop(self.page_param_name, 0)
         self.size = filters.pop(self.page_param_name, self.default_page_size)
         new_data = self._filter_items(data, **filters)
         new_data.sort(
