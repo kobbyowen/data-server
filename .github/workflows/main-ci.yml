@@ -38,4 +38,4 @@ jobs:
           coverage run -m unittest discover -v
       - name: Run Coverage Reports
         run: |
-          coverage report --skip-covered --skip-empty -m --fail-under=45 --omit="tests/*"
+          coverage report --skip-empty -m --fail-under=100 --omit="tests/*"
