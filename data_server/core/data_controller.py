@@ -66,13 +66,17 @@ class DataController:
         del parent[index]
 
     def patch_item(self, path: ItemPath, id: IdType, new_data: JSONItem) -> JSONItem:
+        if self.id_name in new_data:
+            raise ValueError("id cannot be patched")
         parent, index = self._get_item_parent_and_index(path, id)
         parent[index].update(new_data)
         return self._update_timestamps(parent[index])
 
     def replace_item(self, path: ItemPath, id: IdType, new_data: JSONItem) -> JSONItem:
+        if self.id_name in new_data:
+            raise ValueError("id cannot be replaced")
         parent, index = self._get_item_parent_and_index(path, id)
-        parent[index] = new_data
+        parent[index] = {**new_data, self.id_name: id}
         return self._update_timestamps(parent[index])
 
     def add_item(self, path: ItemPath, new_data: JSONItem) -> JSONItem:

@@ -188,31 +188,64 @@ class TestAddItem(unittest.TestCase):
 
 
 class TestPatchItem(unittest.TestCase):
-    def test_patch_item_with_correct_id(self):
-        pass
 
-    def test_patch_item_with_correct_path_but_nonexisting(self):
-        pass
+    def setUp(self) -> None:
+        super().setUp()
+        self.data = deepcopy(data_sample)
+
+    def test_patch_item_with_correct_id(self):
+        new_data = {"author": "Pius Owen", "title": "Testing With Python"}
+        controller = DataController(self.data)
+        results = controller.patch_item(["books"], 1, new_data)
+        items = controller.get_items(["books"], **new_data)
+        self.assertEqual(len(items), 1)
+        self.assertDictEqual(results, items[0])
+
+    def test_patch_item_with_correct_path_but_nonexisting_id(self):
+        new_data = {"author": "Pius Owen", "title": "Testing With Python"}
+        controller = DataController(self.data)
+        with self.assertRaises(ItemNotFoundError):
+            controller.patch_item(["books"], 200, new_data)
 
     def test_patch_item_with_wrong_path(self):
-        pass
+        new_data = {"author": "Pius Owen", "title": "Testing With Python"}
+        controller = DataController(self.data)
+        with self.assertRaises(ItemNotFoundError):
+            controller.patch_item(["all_books"], 1, new_data)
 
-    def test_patch_item_with_teimstamps(self):
-        pass
+    def test_patch_item_with_data_containing_id(self):
+        new_data = {"author": "Pius Owen", "title": "Testing With Python", "test_id": 20}
+        controller = DataController(self.data, id_name="test_id")
+        with self.assertRaises(ValueError):
+            controller.patch_item(["books"], 1, new_data)
+
+    def test_patch_item_with_timestamps(self):
+        new_data = {"author": "Pius Owen", "title": "Testing With Python"}
+        controller = DataController(self.data, use_timestamps=True)
+        results = controller.patch_item(["books"], 1, new_data)
+        items = controller.get_items(["books"], **new_data)
+        self.assertEqual(len(items), 1)
+        self.assertIn("updated_at", results)
 
 
 class TestReplaceItem(unittest.TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.data = deepcopy(data_sample)
+
     def test_replace_item_with_correct_id(self):
-        pass
+        new_data = {"author": "Pius Owen", "title": "Testing With Python"}
+        controller = DataController(self.data)
+        results = controller.replace_item(["books"], 1, new_data)
+        items = controller.get_items(["books"], **new_data)
+        self.assertDictEqual(results, {**new_data, "id": 1})
+        self.assertEqual(len(items), 1)
 
-    def test_replace_item_with_teimstamps(self):
-        pass
-
-    def test_replace_item_with_correct_path_but_nonexisting(self):
-        pass
-
-    def test_replace_item_with_wrong_path(self):
-        pass
+    def test_patch_item_with_data_containing_id(self):
+        new_data = {"author": "Pius Owen", "title": "Testing With Python", "test_id": 20}
+        controller = DataController(self.data, id_name="test_id")
+        with self.assertRaises(ValueError):
+            controller.replace_item(["books"], 1, new_data)
 
 
 if __name__ == "__main__":
