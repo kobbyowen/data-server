@@ -2,6 +2,7 @@ from typing import Text, Any, Dict, List, Union
 from copy import deepcopy
 from ..data_controller import DataController, IdType, JSONItem, JSONItems
 
+
 class DataAdapter:
     def __init__(self, resource: Union[Text, JSONItem], **kwargs: Any):
         if isinstance(resource, dict):

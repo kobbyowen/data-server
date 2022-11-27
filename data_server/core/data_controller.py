@@ -1,4 +1,4 @@
-from typing import Dict, Text, Any, List, Union, Tuple, Optional, Callable, cast
+from typing import Dict, Text, Any, List, Union, Tuple, Optional, cast
 from enum import Enum
 from functools import reduce
 from datetime import datetime
