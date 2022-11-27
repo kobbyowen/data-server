@@ -7,7 +7,7 @@ class DataAdapter:
     def __init__(self, resource: Union[Text, JSONItem], **kwargs: Any):
         if isinstance(resource, dict):
             data = deepcopy(resource)
-            self.resource = data
+            self.resource = None
         else:
             assert isinstance(resource, str)
             data = self.read_data()
@@ -18,8 +18,6 @@ class DataAdapter:
         raise NotImplementedError
 
     def save_data(self) -> None:
-        if isinstance(self.resource, dict):
-            return
         raise NotImplementedError
 
     def execute_get_item_request(self, path: Text, id: IdType):

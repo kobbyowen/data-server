@@ -35,8 +35,6 @@ class TestDataAdapterMethods(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             TestAdapter("").save_data()
 
-        self.assertIsNone(self.adapter.save_data())
-
     def test_execute_get_item_request(self):
         item = self.adapter.execute_get_item_request("/books", 1)
         self.assertDictEqual(item, {"id": 1, "author": "Kobby Owen", "title": "Advanced Python"})
