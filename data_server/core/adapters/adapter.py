@@ -1,6 +1,6 @@
 from typing import Text, Any, Dict, List, Union
 from copy import deepcopy
-from ..data_controller import DataController, IdType, JSONItem
+from ..data_controller import DataController, IdType, JSONItem, JSONItems
 
 
 class DataAdapter:
@@ -20,25 +20,25 @@ class DataAdapter:
     def save_data(self) -> None:
         raise NotImplementedError
 
-    def execute_get_item_request(self, path: Text, id: IdType):
+    def execute_get_item_request(self, path: Text, id: IdType) -> JSONItem:
         return self._controller.get_item(self._split_paths(path), id)
 
-    def execute_get_request(self, path: Text, **filters: Any):
+    def execute_get_request(self, path: Text, **filters: Any) -> JSONItems:
         return self._controller.get_items(self._split_paths(path), **filters)
 
-    def execute_post_request(self, path: Text, data: Any):
+    def execute_post_request(self, path: Text, data: Any) -> JSONItem:
         return self._controller.add_item(self._split_paths(path), data)
 
-    def execute_patch_request(self, path: Text, id: IdType,  data: Any):
+    def execute_patch_request(self, path: Text, id: IdType,  data: Any) -> JSONItem:
         return self._controller.patch_item(self._split_paths(path), id, data)
 
-    def execute_put_request(self, path: Text, id: IdType, data: Any):
+    def execute_put_request(self, path: Text, id: IdType, data: Any) -> JSONItem:
         return self._controller.replace_item(self._split_paths(path), id, data)
 
-    def execute_delete_request(self, path: Text, id: IdType):
+    def execute_delete_request(self, path: Text, id: IdType) -> None:
         return self._controller.delete_item(self._split_paths(path), id)
 
-    def get_data(self):
+    def get_data(self) -> JSONItem:
         return self._controller.data
 
     @ staticmethod

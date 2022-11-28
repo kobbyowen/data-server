@@ -1,4 +1,4 @@
-from typing import Dict, Text, Any, List, Union, Tuple, Optional
+from typing import Dict, Text, Any, List, Union, Tuple, Optional, cast
 from enum import Enum
 from functools import reduce
 from datetime import datetime
@@ -206,9 +206,9 @@ class DataController:
         return items, item_index
 
     def _get_item_by_path_only(
-            self, path: ItemPath) -> Union[JSONItem, JSONItems]:
+            self, path: ItemPath) -> Union[JSONItems, JSONItem]:
         try:
-            value = reduce(lambda prev, cur: prev[cur], path, self.data)
+            value = reduce(lambda prev, cur: cast(JSONItem, prev[cur]), path, self.data)
             return value
         except KeyError:
             raise ItemNotFoundError(f"{path} could not be resloved in data")
@@ -236,7 +236,7 @@ class DataController:
         item[self.updated_at_key_name] = None if update_updated_at else datetime.now().isoformat()
         return item
 
-    def _get_items(self, data: JSONItems, **filters: Any):
+    def _get_items(self, data: JSONItems, **filters: Any) -> JSONItems:
         sort_key = filters.pop(self.sort_key_param_name, self.id_name)
         self.order = filters.pop(
             self.order_param_name, SortOrder.ASC.value)

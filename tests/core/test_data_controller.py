@@ -10,11 +10,11 @@ class TestInitialization(unittest.TestCase):
     def setUp(self) -> None:
         return super().setUp()
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         controller = DataController(data_sample_with_empty_posts)
         self.assertIsInstance(controller, DataController)
 
-    def test_get_proper_id_type(self):
+    def test_get_proper_id_type(self) -> None:
         controller = DataController(data_sample_with_int_ids)
         self.assertIs(controller.id_type, int)
         controller = DataController(data_sample_with_string_ids)
@@ -25,7 +25,7 @@ class TestGetItem(unittest.TestCase):
     def setUp(self) -> None:
         return super().setUp()
 
-    def test_get_item_with_id(self):
+    def test_get_item_with_id(self) -> None:
         controller = DataController(data_sample_with_int_ids)
         item = controller.get_item(["posts"], 1)
         self.assertDictEqual(item, data_sample_with_int_ids["posts"][0])
@@ -34,19 +34,19 @@ class TestGetItem(unittest.TestCase):
         item = controller.get_item(["posts"], 1)
         self.assertDictEqual(item, data_sample_with_id_name_as_uuid["posts"][0])
 
-    def test_get_item_with_id_with_nested_path(self):
+    def test_get_item_with_id_with_nested_path(self) -> None:
         controller = DataController(data_sample_with_nested_items)
         item = controller.get_item(["posts", "comments", "all"], 1)
         self.assertDictEqual(item, data_sample_with_nested_items["posts"]["comments"]["all"][0])
 
-    def test_get_item_with_id_that_does_not_exist(self):
+    def test_get_item_with_id_that_does_not_exist(self) -> None:
         controller = DataController(data_sample_with_int_ids)
         with self.assertRaises(ItemNotFoundError):
             controller.get_item(["posts"], 20)
 
 
 class TestGetItems(unittest.TestCase):
-    def test_get_items(self):
+    def test_get_items(self) -> None:
         controller = DataController(data_sample)
         items = controller.get_items(["books"])
         self.assertEqual(len(items), len(data_sample["books"]))
@@ -55,7 +55,7 @@ class TestGetItems(unittest.TestCase):
             "id": 1, "author": "Kobby Owen", "title": "Advanced Python"
         })
 
-    def test_get_items_with_filters(self):
+    def test_get_items_with_filters(self) -> None:
         items = DataController(data_sample).get_items(["books"], author="Kobby Owen")
         self.assertEqual(len(items), 2)
         for item in items:
@@ -72,7 +72,7 @@ class TestGetItems(unittest.TestCase):
         items = DataController(data_sample).get_items(["books"], author="Dummy Author", title="Everything about Python")
         self.assertEqual(len(items), 0)
 
-    def test_get_items_in_sort_order(self):
+    def test_get_items_in_sort_order(self) -> None:
         items = DataController(data_sample).get_items(["books"], sort_by="author")
         self.assertEqual(len(items), len(data_sample["books"]))
         self.assertEqual(items[0]["author"], "Beverly Jones")
@@ -83,13 +83,13 @@ class TestGetItems(unittest.TestCase):
         self.assertEqual(items[len(items) - 1]["title"], "Advanced Python")
         self.assertEqual(items[0]["title"], "Python In A Nutshell")
 
-    def test_get_items_with_page_and_size(self):
+    def test_get_items_with_page_and_size(self) -> None:
         items = DataController(data_sample).get_items(["books"], page=0, size=2)
         self.assertEqual(len(items), 2)
         items = DataController(data_sample).get_items(["books"], page=3, size=2)
         self.assertEqual(len(items), 1)
 
-    def test_get_items_with_path_that_does_not_exist(self):
+    def test_get_items_with_path_that_does_not_exist(self) -> None:
         controller = DataController(data_sample_with_nested_items)
         with self.assertRaises(ItemNotFoundError):
             controller.get_item(["posts", "comments", "self"], 1)
@@ -103,7 +103,7 @@ class TestDeleteItem(unittest.TestCase):
         super().setUp()
         self.data = deepcopy(data_sample)
 
-    def test_delete_item_with_correct_id(self):
+    def test_delete_item_with_correct_id(self) -> None:
         controller = DataController(self.data)
         controller.delete_item(["books"], 1)
         self.assertEqual(len(data_sample["books"]) - 1, len(self.data["books"]))
@@ -112,14 +112,14 @@ class TestDeleteItem(unittest.TestCase):
         self.assertEqual(len(data_sample["books"]) - 2, len(self.data["books"]))
         self.assertEqual(len([item for item in self.data["books"] if item["id"] == 2]), 0)
 
-    def test_delete_item_with_correct_path_but_nonexisting_id(self):
+    def test_delete_item_with_correct_path_but_nonexisting_id(self) -> None:
         controller = DataController(self.data)
         with self.assertRaises(ItemNotFoundError):
             controller.delete_item(["books"], 3000)
         # make sure nothing is deleted
         self.assertEqual(len(data_sample), len(self.data))
 
-    def test_delete_item_with_wrong_path(self):
+    def test_delete_item_with_wrong_path(self) -> None:
         controller = DataController(self.data)
         with self.assertRaises(ItemNotFoundError):
             controller.delete_item(["path"], 1)
@@ -132,7 +132,7 @@ class TestAddItem(unittest.TestCase):
         super().setUp()
         self.data = deepcopy(data_sample)
 
-    def test_add_item_with_autogenerate_int_id(self):
+    def test_add_item_with_autogenerate_int_id(self) -> None:
         new_book = {"author": "Kobby Owen", "title": "Testing With Python"}
         controller = DataController(self.data, autogenerate_id=True, id_name="id")
         results = controller.add_item(["books"], new_book)
@@ -141,7 +141,7 @@ class TestAddItem(unittest.TestCase):
         self.assertIsInstance(results["id"], int)
         self.assertEqual(len([item for item in self.data["books"] if item["id"] == results["id"]]), 1)
 
-    def test_add_item_with_autogenerate_string_id(self):
+    def test_add_item_with_autogenerate_string_id(self) -> None:
         self.data = deepcopy(data_sample_with_string_ids)
         new_book = {"author": "Kobby Owen", "title": "Testing With Python"}
         controller = DataController(self.data, autogenerate_id=True, id_name="id")
@@ -151,7 +151,7 @@ class TestAddItem(unittest.TestCase):
         self.assertIsInstance(results["id"], str)
         self.assertEqual(len([item for item in self.data["posts"] if item["id"] == results["id"]]), 1)
 
-    def test_add_item_with_timestamps(self):
+    def test_add_item_with_timestamps(self) -> None:
         new_book = {"author": "Kobby Owen", "title": "Testing With Python"}
         controller = DataController(self.data, autogenerate_id=True, id_name="id", use_timestamps=True)
         results = controller.add_item(["books"], new_book)
@@ -160,7 +160,7 @@ class TestAddItem(unittest.TestCase):
         self.assertIsInstance(results["id"], int)
         self.assertEqual(len([item for item in self.data["books"] if item["id"] == results["id"]]), 1)
 
-    def test_add_item_with_no_timestamps(self):
+    def test_add_item_with_no_timestamps(self) -> None:
         new_book = {"author": "Kobby Owen", "title": "Testing With Python"}
         controller = DataController(self.data, autogenerate_id=True, id_name="id", use_timestamps=False)
         results = controller.add_item(["books"], new_book)
@@ -168,7 +168,7 @@ class TestAddItem(unittest.TestCase):
         self.assertNotIn("updated_at", results)
         self.assertEqual(len([item for item in self.data["books"] if item["id"] == results["id"]]), 1)
 
-    def test_add_item_with_existing_id(self):
+    def test_add_item_with_existing_id(self) -> None:
         new_book = {"id": 1, "author": "Kobby Owen", "title": "Testing With Python"}
         old_length = len(self.data)
         controller = DataController(self.data, autogenerate_id=False, id_name="id", use_timestamps=False)
@@ -177,7 +177,7 @@ class TestAddItem(unittest.TestCase):
         # make sure nothing is added
         self.assertEqual(old_length, len(self.data))
 
-    def test_add_item_with_no_existing_id(self):
+    def test_add_item_with_no_existing_id(self) -> None:
         new_book = {"id": 2000, "author": "Kobby Owen", "title": "Testing With Python"}
         controller = DataController(self.data, autogenerate_id=False, id_name="id")
         results = controller.add_item(["books"], new_book)
@@ -193,7 +193,7 @@ class TestPatchItem(unittest.TestCase):
         super().setUp()
         self.data = deepcopy(data_sample)
 
-    def test_patch_item_with_correct_id(self):
+    def test_patch_item_with_correct_id(self) -> None:
         new_data = {"author": "Pius Owen", "title": "Testing With Python"}
         controller = DataController(self.data)
         results = controller.patch_item(["books"], 1, new_data)
@@ -201,25 +201,25 @@ class TestPatchItem(unittest.TestCase):
         self.assertEqual(len(items), 1)
         self.assertDictEqual(results, items[0])
 
-    def test_patch_item_with_correct_path_but_nonexisting_id(self):
+    def test_patch_item_with_correct_path_but_nonexisting_id(self) -> None:
         new_data = {"author": "Pius Owen", "title": "Testing With Python"}
         controller = DataController(self.data)
         with self.assertRaises(ItemNotFoundError):
             controller.patch_item(["books"], 200, new_data)
 
-    def test_patch_item_with_wrong_path(self):
+    def test_patch_item_with_wrong_path(self) -> None:
         new_data = {"author": "Pius Owen", "title": "Testing With Python"}
         controller = DataController(self.data)
         with self.assertRaises(ItemNotFoundError):
             controller.patch_item(["all_books"], 1, new_data)
 
-    def test_patch_item_with_data_containing_id(self):
+    def test_patch_item_with_data_containing_id(self) -> None:
         new_data = {"author": "Pius Owen", "title": "Testing With Python", "test_id": 20}
         controller = DataController(self.data, id_name="test_id")
         with self.assertRaises(ValueError):
             controller.patch_item(["books"], 1, new_data)
 
-    def test_patch_item_with_timestamps(self):
+    def test_patch_item_with_timestamps(self) -> None:
         new_data = {"author": "Pius Owen", "title": "Testing With Python"}
         controller = DataController(self.data, use_timestamps=True)
         results = controller.patch_item(["books"], 1, new_data)
@@ -233,7 +233,7 @@ class TestReplaceItem(unittest.TestCase):
         super().setUp()
         self.data = deepcopy(data_sample)
 
-    def test_replace_item_with_correct_id(self):
+    def test_replace_item_with_correct_id(self) -> None:
         new_data = {"author": "Pius Owen", "title": "Testing With Python"}
         controller = DataController(self.data)
         results = controller.replace_item(["books"], 1, new_data)
@@ -241,7 +241,7 @@ class TestReplaceItem(unittest.TestCase):
         self.assertDictEqual(results, {**new_data, "id": 1})
         self.assertEqual(len(items), 1)
 
-    def test_patch_item_with_data_containing_id(self):
+    def test_patch_item_with_data_containing_id(self) -> None:
         new_data = {"author": "Pius Owen", "title": "Testing With Python", "test_id": 20}
         controller = DataController(self.data, id_name="test_id")
         with self.assertRaises(ValueError):
