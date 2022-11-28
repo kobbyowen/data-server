@@ -15,8 +15,8 @@ class TestAdapterInitialization(unittest.TestCase):
 
 
 class TestSplitPath(unittest.TestCase):
-    def test_split_path(self) -> None:
-        paths = ["", "/path/to/resource", "path/to/resource", "path/to/resource", "/path/to/resource"]
+    def test_split_path(self):
+        paths = ["", "/path/to/resource", "path/to/resource", "path/to/resource", "/path/to/resource/"]
         expected = [[], ["path", "to", "resource"], ["path", "to", "resource"], ["path", "to", "resource"]]
 
         for path, expected_result in zip(paths, expected):
