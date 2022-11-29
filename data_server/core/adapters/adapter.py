@@ -7,11 +7,11 @@ class DataAdapter:
     def __init__(self, resource: Union[Text, JSONItem], **kwargs: Any):
         if isinstance(resource, dict):
             data = deepcopy(resource)
-            self.resource = None
+            self.resource = ""
         else:
             assert isinstance(resource, str)
-            data = self.read_data()
             self.resource = resource
+            data = self.read_data()
         self._controller = DataController(data, **kwargs)
 
     def read_data(self) -> Dict[Text, Any]:
