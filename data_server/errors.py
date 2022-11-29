@@ -16,3 +16,12 @@ class ItemNotFoundError(DataControllerError):
 
 class DuplicateIDFound(DataControllerError):
     pass
+
+
+class AdapterError(DataServerError):
+    def __init__(self, description: str):
+        super().__init__(500, description)
+
+
+class JSONAdapterError(AdapterError):
+    pass
