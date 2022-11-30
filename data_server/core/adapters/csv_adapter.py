@@ -46,9 +46,7 @@ class CsvAdapter(DataAdapter):
     def _generate_key(resource: Text, key: Optional[Text] = None) -> Text:
         if key is not None:
             return key
-        else:
-            # pick the root element name before the extension.
-            return CsvAdapter._get_file_stem(resource)
+        return CsvAdapter._get_file_stem(resource)
 
     @staticmethod
     def _get_file_stem(resource: Text) -> Text:
