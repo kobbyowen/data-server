@@ -42,7 +42,7 @@ class DataAdapter:
     def get_data(self) -> JSONItem:
         return self._controller.data
 
-    @ staticmethod
+    @staticmethod
     def _split_paths(path: Text) -> List[Text]:
         path_as_list = [sub_path for sub_path in path.strip("/").split("/") if sub_path]
         return path_as_list
