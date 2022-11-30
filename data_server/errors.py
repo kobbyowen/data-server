@@ -23,5 +23,9 @@ class AdapterError(DataServerError):
         super().__init__(500, description)
 
 
+class CsvAdapterError(AdapterError):
+    pass
+
+
 class JSONAdapterError(AdapterError):
     pass
