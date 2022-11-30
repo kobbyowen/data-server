@@ -1,6 +1,7 @@
 from typing import Text, Any, Dict, List, Union
 from copy import deepcopy
-from ..data_controller import DataController, IdType, JSONItem, JSONItems
+
+from data_server.core.data_controller import JSONItem, DataController, IdType, JSONItems
 
 
 class DataAdapter:
