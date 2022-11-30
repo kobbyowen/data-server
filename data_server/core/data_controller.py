@@ -24,7 +24,7 @@ class DataController:
                  page_param_name: Text = "page", size_param_name: Text = "size",
                  default_page_size: int = 10, autogenerate_id: bool = False, use_timestamps: bool = False,
                  created_at_key_name: Text = "created_at", updated_at_key_name: Text = "updated_at"):
-        """Initializes a data controller class. DataController is ab abstraction that allows querying and modify data
+        """Initializes a data controller class. DataController is an abstraction that allows querying and modify data
         which is loaded a dictionary.
 
         Args:
