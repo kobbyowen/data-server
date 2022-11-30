@@ -50,6 +50,5 @@ class CsvAdapter(DataAdapter):
 
     @staticmethod
     def _get_file_stem(resource: Text) -> Text:
-        # detect separator used
         separator = "/" if "/" in resource else "\\"
         return resource.split(separator)[-1].split('.')[0]
