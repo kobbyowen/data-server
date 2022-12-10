@@ -66,3 +66,18 @@ class TestDataAdapterMethods(unittest.TestCase):
 
     def test_get_data(self) -> None:
         self.assertDictEqual(self.adapter.get_data(), data_sample)
+
+    def test_get_urls(self) -> None:
+        urls = self.adapter.get_urls()
+        self.assertListEqual(urls, ["/books"])
+        urls = DataAdapter({"index": {"posts": [], "comments": [], "date": {
+                           " year": 2000, "month": 11, "day": 15}}}).get_urls()
+        self.assertListEqual(urls, ["/index", "/index/posts", "/index/comments", "/index/date"])
+
+    def test_get_url_data(self) -> None:
+        urls = self.adapter.get_url_data()
+        self.assertListEqual(urls, [("/books", list)])
+        urls = DataAdapter({"index": {"posts": [], "comments": [], "date": {
+                           " year": 2000, "month": 11, "day": 15}}}).get_url_data()
+        self.assertListEqual(urls, [("/index", dict), ("/index/posts", list),
+                             ("/index/comments", list), ("/index/date", dict)])

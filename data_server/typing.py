@@ -1,4 +1,5 @@
 import typing as t
+from enum import Enum
 
 JSONItem = t.Dict[t.Text, t.Any]
 
@@ -11,3 +12,12 @@ FilterParams = t.Dict[t.Text, t.Any]
 IdType = t.Union[t.Text, int]
 
 ItemPath = t.List[t.Text]
+
+ReponseHeaders = t.Dict[t.Text, t.Text]
+
+RouterResponse = t.Union[JSONItem, JSONItems]
+
+
+class SortOrder(str, Enum):
+    ASC = "asc"
+    DESC = "desc"
