@@ -47,18 +47,18 @@ class TestDataAdapterMethods(unittest.TestCase):
     def test_execute_post_request(self) -> None:
         data = {"author": "Kobby Owen", "title": "Python In 30 Days"}
         item = self.adapter.execute_post_request("/books", data)
-        self.assertDictContainsSubset(data, item)
+        self.assertLessEqual(data.items(), item.items())
         self.assertEqual(len(self.adapter.get_data()["books"]), len(data_sample["books"]) + 1)
 
     def test_execute_patch_request(self) -> None:
         data = {"title": "Python In 30 Days"}
         item = self.adapter.execute_patch_request("/books", 1, data)
-        self.assertDictContainsSubset(data, item)
+        self.assertLessEqual(data.items(), item.items())
 
     def test_execute_put_request(self) -> None:
         data = {"author": "Kobby Owen", "title": "Python In 30 Days"}
         item = self.adapter.execute_put_request("/books", 1, data)
-        self.assertDictContainsSubset(data, item)
+        self.assertLessEqual(data.items(), item.items())
 
     def test_execute_delete_request(self) -> None:
         self.adapter.execute_delete_request("/books", 1)
