@@ -21,10 +21,3 @@ RouterResponse = t.Union[JSONItem, JSONItems]
 class SortOrder(str, Enum):
     ASC = "asc"
     DESC = "desc"
-
-
-class RouterParameters(t.TypedDict):
-    method: t.Text
-    url: t.Text
-    query_parameters: t.Optional[t.Dict[t.Text, t.Text]]
-    data: t.Optional[JSONItem]
