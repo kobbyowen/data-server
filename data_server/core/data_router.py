@@ -87,7 +87,6 @@ class DataRouter:
         query_parameters = query_parameters or {}
         data = data or {}
         base_url, resource_id = self._parse_url(url)
-        print(base_url, resource_id)
         if method == HTTPMethod.GET:
             return self._handle_http_get_request(base_url, resource_id, **query_parameters)
         if method == HTTPMethod.POST:
