@@ -26,6 +26,9 @@ class HTTPMethod(str, Enum):
     PATCH = "PATCH"
 
 
+URL_SEPARATOR = "/"
+
+
 class DataRouter:
     def __init__(self, resource: t.Union[t.Text, dt.JSONItem], **kwargs: t.Any) -> None:
         self.resource = resource
@@ -47,18 +50,17 @@ class DataRouter:
 
     @staticmethod
     def _create_data_adapter(resource_type: ResourceType, resource: t.Text, **kwargs: t.Any) -> DataAdapter:
-        if resource_type == ResourceType.JSON_FILE:
-            return JSONAdapter(resource, **kwargs)
         if resource_type == ResourceType.CSV_FILE:
             return CsvAdapter(resource, **kwargs)
-        raise ValueError(f"Unknow resource type {resource_type.value!r}")
+        # default to json adapter
+        return JSONAdapter(resource, **kwargs)
 
     def _parse_url(self, url: t.Text) -> t.Tuple[t.Text, t.Optional[dt.IdType]]:
         all_urls = self.data_adapter.get_urls()
         if url in all_urls:
             return url, None
-        *url_base, resource_id = url.split("/")
-        base_url = "/" + "/".join(url_base)
+        *url_base, resource_id = url.split(URL_SEPARATOR)
+        base_url = URL_SEPARATOR + URL_SEPARATOR.join(url_base).strip(URL_SEPARATOR)
         if base_url not in all_urls:
             raise ItemNotFoundError(f"{url!r} not found")
         id_type = self.data_adapter._controller.id_type or str
@@ -82,16 +84,28 @@ class DataRouter:
     def _handle_http_request(self, method: t.Text, url: t.Text, *,
                              query_parameters: t.Optional[t.Dict[t.Text, t.Text]] = None,
                              data: t.Optional[dt.JSONItem] = None) -> dt.RouterResponse:
-        url = "/" + url.strip("/")
-        method = method.upper()
         query_parameters = query_parameters or {}
         data = data or {}
         base_url, resource_id = self._parse_url(url)
+        print(base_url, resource_id)
         if method == HTTPMethod.GET:
             return self._handle_http_get_request(base_url, resource_id, **query_parameters)
         if method == HTTPMethod.POST:
             return self.data_adapter.execute_post_request(base_url, data)
         if method == HTTPMethod.PATCH or method == HTTPMethod.PUT:
             assert resource_id is not None
-            self._handle_http_update_request(method, base_url, resource_id, data)
+            return self._handle_http_update_request(method, base_url, resource_id, data)
+        if method == HTTPMethod.DELETE:
+            assert resource_id is not None
+            self.data_adapter.execute_delete_request(base_url, resource_id)
+            return {}
         raise ValueError(f"cannot handle request for method {method!r}")
+
+    def __call__(self, *, method: t.Text, url: t.Text,
+                 query_parameters: t.Optional[t.Dict[t.Text, t.Text]] = None,
+                 data: t.Optional[dt.JSONItem] = None) -> dt.RouterResponse:
+        method = method.upper()
+        url = URL_SEPARATOR + url.strip(URL_SEPARATOR)
+        method = method.upper()
+        results = self._handle_http_request(method, url, query_parameters=query_parameters, data=data)
+        return results
