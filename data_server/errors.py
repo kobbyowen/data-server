@@ -1,17 +1,18 @@
 class DataServerError(Exception):
-    def __init__(self, code: int, description: str):
-        super().__init__()
+    def __init__(self, description: str, code: int = 500):
+        super().__init__(description, code)
         self.code = code
         self.description = description
 
 
 class DataControllerError(DataServerError):
-    def __init__(self, description: str):
-        super().__init__(400, description)
+    def __init__(self, description: str, code: int = 400):
+        super().__init__(description, code)
 
 
 class ItemNotFoundError(DataControllerError):
-    pass
+    def __init__(self, description: str, code: int = 404):
+        super().__init__(description, code)
 
 
 class DuplicateIDFound(DataControllerError):
@@ -19,8 +20,8 @@ class DuplicateIDFound(DataControllerError):
 
 
 class AdapterError(DataServerError):
-    def __init__(self, description: str):
-        super().__init__(500, description)
+    def __init__(self, description: str, code: int = 400):
+        super().__init__(description, code)
 
 
 class CsvAdapterError(AdapterError):

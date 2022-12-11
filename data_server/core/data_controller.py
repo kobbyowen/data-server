@@ -1,16 +1,10 @@
 import typing as t
-from enum import Enum
 from functools import reduce
 from datetime import datetime
 from uuid import uuid4
 
 from data_server.errors import ItemNotFoundError, DuplicateIDFound
 import data_server.typing as dt
-
-
-class SortOrder(Enum):
-    ASC = "asc"
-    DESC = "desc"
 
 
 class DataController:
@@ -234,16 +228,16 @@ class DataController:
     def _get_items(self, data: dt.JSONItems, **filters: t.Any) -> dt.JSONItems:
         sort_key = filters.pop(self.sort_key_param_name, self.id_name)
         self.order = filters.pop(
-            self.order_param_name, SortOrder.ASC.value)
-        self.order = SortOrder.ASC if self.order.lower(
-        ) == SortOrder.ASC.value else SortOrder.DESC
+            self.order_param_name, dt.SortOrder.ASC.value)
+        self.order = dt.SortOrder.ASC if self.order.lower(
+        ) == dt.SortOrder.ASC.value else dt.SortOrder.DESC
         self.page = filters.pop(self.page_param_name, 0)
         self.size = filters.pop(self.size_param_name, self.default_page_size)
         new_data = self._filter_items(data, **filters)
         new_data.sort(
-            key=lambda item: item.get(sort_key, list(self.data.keys())[0]), reverse=self.order == SortOrder.DESC)
-        start_index = self.page * self.size
-        end_index = start_index + self.size
+            key=lambda item: item.get(sort_key, list(self.data.keys())[0]), reverse=self.order == dt.SortOrder.DESC)
+        start_index = int(self.page) * int(self.size)
+        end_index = start_index + int(self.size)
         return new_data[start_index:end_index]
 
     def _autogenerate_id(self, data_length: int) -> t.Union[t.Text, int]:

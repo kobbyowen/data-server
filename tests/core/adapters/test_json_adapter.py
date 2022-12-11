@@ -14,7 +14,6 @@ class TestJSONAdapter(unittest.TestCase):
 
     @mock.patch("os.path.exists", return_value=False)
     def test_initialization_with_file_that_does_not_exist(self, os_patch: mock.MagicMock) -> None:
-        print(type(os_patch))
         with self.assertRaises(AdapterError):
             JSONAdapter("json_file.json")
         self.assertTrue(os_patch.called)

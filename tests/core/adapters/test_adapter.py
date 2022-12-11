@@ -47,18 +47,18 @@ class TestDataAdapterMethods(unittest.TestCase):
     def test_execute_post_request(self) -> None:
         data = {"author": "Kobby Owen", "title": "Python In 30 Days"}
         item = self.adapter.execute_post_request("/books", data)
-        self.assertDictContainsSubset(data, item)
+        self.assertLessEqual(data.items(), item.items())
         self.assertEqual(len(self.adapter.get_data()["books"]), len(data_sample["books"]) + 1)
 
     def test_execute_patch_request(self) -> None:
         data = {"title": "Python In 30 Days"}
         item = self.adapter.execute_patch_request("/books", 1, data)
-        self.assertDictContainsSubset(data, item)
+        self.assertLessEqual(data.items(), item.items())
 
     def test_execute_put_request(self) -> None:
         data = {"author": "Kobby Owen", "title": "Python In 30 Days"}
         item = self.adapter.execute_put_request("/books", 1, data)
-        self.assertDictContainsSubset(data, item)
+        self.assertLessEqual(data.items(), item.items())
 
     def test_execute_delete_request(self) -> None:
         self.adapter.execute_delete_request("/books", 1)
@@ -66,3 +66,18 @@ class TestDataAdapterMethods(unittest.TestCase):
 
     def test_get_data(self) -> None:
         self.assertDictEqual(self.adapter.get_data(), data_sample)
+
+    def test_get_urls(self) -> None:
+        urls = self.adapter.get_urls()
+        self.assertListEqual(urls, ["/books"])
+        urls = DataAdapter({"index": {"posts": [], "comments": [], "date": {
+                           " year": 2000, "month": 11, "day": 15}}}).get_urls()
+        self.assertListEqual(urls, ["/index", "/index/posts", "/index/comments", "/index/date"])
+
+    def test_get_url_data(self) -> None:
+        urls = self.adapter.get_url_data()
+        self.assertListEqual(urls, [("/books", list)])
+        urls = DataAdapter({"index": {"posts": [], "comments": [], "date": {
+                           " year": 2000, "month": 11, "day": 15}}}).get_url_data()
+        self.assertListEqual(urls, [("/index", dict), ("/index/posts", list),
+                             ("/index/comments", list), ("/index/date", dict)])
