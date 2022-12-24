@@ -40,7 +40,7 @@ class Server:
         return all_headers
 
     def _handle_error_response(self, exception: Exception) -> t.Tuple[dt.JSONItem, int, dt.RequestHeaders]:
-        def construct_erorr_response(message, code, details): return (
+        def construct_erorr_response(message: t.Text, code: int, details: t.Any) -> dt.JSONItem: return (
             {"error": {"description": message, "code": code, "details": details}})
 
         if isinstance(exception, DataServerError):
@@ -88,17 +88,15 @@ class Server:
         headers.update(self.additional_headers)
         return headers
 
-    def __call__(self, environ, start_response) -> t.Any:
+    def __call__(self, environ: t.Any, start_response: t.Any) -> t.Any:
         request = Request(environ)
         response_content, status_code, headers = self._handle_request(request)
         headers = self._update_headers(headers)
-        response_args = {"status": status_code, "headers": headers}
-        if response_content:
-            response_args["mimetype"] = "application/json"
-        response = Response(response_content, **response_args)
+        response = Response(response_content, status=status_code, headers=headers,
+                            mimetype="application/json" if response_content else None)
         if self.sleep_before_request:
             time.sleep(self.sleep_before_request / 1000)
         return response(environ, start_response)
 
-    def run(self):
+    def run(self) -> None:
         run_simple(self.host, self.port, self, use_reloader=True, reloader_interval=self.reload_interval)
