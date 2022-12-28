@@ -1,4 +1,4 @@
-import data_server.typing as dt
+import data_server.data_server_types as dt
 
 data_sample: dt.JSONItem = {
     "books": [

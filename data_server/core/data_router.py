@@ -1,6 +1,6 @@
 import typing as t
 from pathlib import Path
-import data_server.typing as dt
+import data_server.data_server_types as dt
 from data_server.errors import ItemNotFoundError
 from data_server.core.adapters.adapter import DataAdapter
 from data_server.core.adapters.json_adapter import JSONAdapter
