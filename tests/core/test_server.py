@@ -8,7 +8,7 @@ from werkzeug.test import create_environ
 
 from data_server.core.server import Server
 from data_server.errors import ItemNotFoundError
-import data_server.typing as dt
+import data_server.data_server_types as dt
 
 
 def default_handler(method: t.Text, url: t.Text, args: t.Any,

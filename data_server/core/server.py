@@ -5,7 +5,7 @@ import warnings
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Request, Response
 from data_server.errors import DataServerError, ItemNotFoundError
-import data_server.typing as dt
+import data_server.data_server_types as dt
 
 URL_SEPARATOR = "/"
 
