@@ -4,7 +4,7 @@ from datetime import datetime
 from uuid import uuid4
 
 from data_server.errors import ItemNotFoundError, DuplicateIDFound
-import data_server.typing as dt
+import data_server.data_server_types as dt
 
 
 class DataController:

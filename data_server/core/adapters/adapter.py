@@ -3,7 +3,7 @@ from copy import deepcopy
 from functools import lru_cache
 
 from data_server.core.data_controller import DataController
-import data_server.typing as dt
+import data_server.data_server_types as dt
 
 
 class DataAdapter:
