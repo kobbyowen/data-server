@@ -66,7 +66,8 @@ class DataRouter:
                              query_parameters: t.Optional[t.Dict[t.Text, t.Text]] = None,
                              data: t.Optional[dt.JSONItem] = None) -> dt.RouterResponse:
         if (url == "/"):
-            index_data = [{"url": url, "methods": ["GET", "POST", "PUT", "PATCH", "OPTIONS", "DELETE"] if data_type == list else ["GET"]}
+            index_data = [{"url": url, "methods": ["GET", "POST", "PUT", "PATCH",
+                                                   "OPTIONS", "DELETE"] if data_type == list else ["GET"]}
                           for url, data_type in self.data_adapter.get_url_data()]
             return index_data
 
