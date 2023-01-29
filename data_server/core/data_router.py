@@ -65,6 +65,11 @@ class DataRouter:
     def _handle_http_request(self, method: t.Text, url: t.Text, *,
                              query_parameters: t.Optional[t.Dict[t.Text, t.Text]] = None,
                              data: t.Optional[dt.JSONItem] = None) -> dt.RouterResponse:
+        if (url == "/"):
+            index_data = [{"url": url, "methods": ["GET", "POST", "PUT", "PATCH", "OPTIONS", "DELETE"] if data_type == list else ["GET"]}
+                          for url, data_type in self.data_adapter.get_url_data()]
+            return index_data
+
         query_parameters = query_parameters or {}
         data = data or {}
         base_url, resource_id = self._parse_url(url)
@@ -81,7 +86,10 @@ class DataRouter:
             return {}
         raise ValueError(f"cannot handle request for method {method!r}")
 
-    def __call__(self, *, method: t.Text, url: t.Text,
+    def get_url_data(self):
+        return self.data_adapter.get_url_data()
+
+    def __call__(self, method: t.Text, url: t.Text,
                  query_parameters: t.Optional[t.Dict[t.Text, t.Text]] = None,
                  data: t.Optional[dt.JSONItem] = None) -> dt.RouterResponse:
         method = method.upper()

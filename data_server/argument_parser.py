@@ -16,7 +16,7 @@ class ArgumentParser:
             epilog=self.program_epilog)
         self._add_server_arguments()
         self._add_controller_arguments()
-        self.parsed_args = self._arg_parser.parse_args(self.arguments)
+        self.parsed_args = self._arg_parser.parse_args()
 
     def _add_server_arguments(self) -> None:
         self._arg_parser.add_argument("file", help="The path of a json or csv file to serve")

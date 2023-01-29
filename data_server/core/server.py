@@ -14,7 +14,7 @@ class Server:
     def __init__(self, request_handler: dt.RequestHandler, *, url_path_prefix: t.Text = "",
                  host: t.Text = "127.0.0.1", port: int = 5000, reload_interval: int = 1,
                  static_folder: t.Optional[t.Text] = None, static_url_prefix: t.Text = "static",
-                 additional_headers: t.Text = "", sleep_before_request: int = 0) -> None:
+                 additional_headers: t.Text = "", sleep_before_request: int = 0, extra_files=None) -> None:
         self.request_handler = request_handler
         self.url_path_prefix = url_path_prefix
         self.host = host
@@ -22,6 +22,7 @@ class Server:
         self.reload_interval = reload_interval
         self.static_folder = static_folder
         self.static_url_folder = static_url_prefix
+        self.extra_files = extra_files or []
         try:
             self.additional_headers = self._parse_additional_headers(additional_headers)
         except Exception as e:
@@ -99,4 +100,5 @@ class Server:
         return response(environ, start_response)
 
     def run(self) -> None:
-        run_simple(self.host, self.port, self, use_reloader=True, reloader_interval=self.reload_interval)
+        run_simple(self.host, self.port, self, use_reloader=True, reloader_interval=self.reload_interval,
+                   extra_files=self.extra_files)
