@@ -11,10 +11,13 @@ URL_SEPARATOR = "/"
 
 
 class Server:
-    def __init__(self, request_handler: dt.RequestHandler, *, url_path_prefix: t.Text = "",
-                 host: t.Text = "127.0.0.1", port: int = 5000, reload_interval: int = 1,
-                 static_folder: t.Optional[t.Text] = None, static_url_prefix: t.Text = "static",
-                 additional_headers: t.Text = "", sleep_before_request: int = 0, extra_files=None) -> None:
+    def __init__(self, request_handler: dt.RequestHandler, *,
+                 url_path_prefix: t.Text = "", host: t.Text = "127.0.0.1",
+                 port: int = 5000, reload_interval: int = 1,
+                 static_folder: t.Optional[t.Text] = None,
+                 static_url_prefix: t.Text = "static",
+                 additional_headers: t.Text = "", sleep_before_request: int = 0,
+                 extra_files: t.Optional[t.List[t.Text]] = None) -> None:
         self.request_handler = request_handler
         self.url_path_prefix = url_path_prefix
         self.host = host
@@ -24,7 +27,8 @@ class Server:
         self.static_url_folder = static_url_prefix
         self.extra_files = extra_files or []
         try:
-            self.additional_headers = self._parse_additional_headers(additional_headers)
+            self.additional_headers = self._parse_additional_headers(
+                additional_headers)
         except Exception as e:
             warnings.warn(f"Failed to parse headers {e.args}")
             self.additional_headers = {}
@@ -33,7 +37,9 @@ class Server:
     def _parse_additional_headers(self, headers_as_text: t.Text) -> t.Dict[t.Text, t.Text]:
         if not headers_as_text:
             return {}
-        headers_as_list = [header_item for header_item in headers_as_text.split(";") if header_item]
+        headers_as_list = [header_item
+                           for header_item in headers_as_text.split(";")
+                           if header_item]
         all_headers = {}
         for header_item in headers_as_list:
             key, value = map(str.strip, header_item.split(":"))
@@ -45,9 +51,12 @@ class Server:
             {"error": {"description": message, "code": code, "details": details}})
 
         if isinstance(exception, DataServerError):
-            return construct_erorr_response(exception.description,
-                                            exception.code, ", ".join(map(str, exception.args))), exception.code, {}
-        return construct_erorr_response(", ".join(map(str, exception.args)), 500, None), 500, {}
+            return construct_erorr_response(
+                exception.description, exception.code, ", ".join(
+                    map(str, exception.args))), exception.code, {}
+        return construct_erorr_response(
+            ", ".join(map(str, exception.args)),
+            500, None), 500, {}
 
     def _handle_options_request(self) -> t.Tuple[t.Text, int, dt.RequestHeaders]:
         headers = self._update_headers(
@@ -65,7 +74,8 @@ class Server:
         path = path.strip(URL_SEPARATOR)
         prefix = prefix.strip(URL_SEPARATOR)
         if not path.startswith(prefix):
-            raise ItemNotFoundError("url cannot be resolved, check if prefix was added correctly")
+            raise ItemNotFoundError(
+                "url cannot be resolved, check if prefix was added correctly")
         return path[len(prefix):]
 
     def _handle_request(self, request: Request) -> t.Tuple[t.Text, int, dt.RequestHeaders]:
@@ -73,11 +83,13 @@ class Server:
             return self._handle_options_request()
 
         query_parameters_as_dict = request.args
-        request_data = request.json if request.is_json else request.get_data(as_text=True)
+        request_data = request.json if request.is_json else request.get_data(
+            as_text=True)
         url = self.strip_url_path_prefix(request.path, self.url_path_prefix)
         try:
-            response_content = self.request_handler(request.method, url,
-                                                    query_parameters_as_dict, t.cast(dt.JSONItem, request_data))
+            response_content = self.request_handler(
+                request.method, url, query_parameters_as_dict, t.cast(
+                    dt.JSONItem, request_data))
         except Exception as e:
             response_content, code, headers = self._handle_error_response(e)
             return self._encode_response_content(response_content), code, headers
@@ -93,12 +105,15 @@ class Server:
         request = Request(environ)
         response_content, status_code, headers = self._handle_request(request)
         headers = self._update_headers(headers)
-        response = Response(response_content, status=status_code, headers=headers,
-                            mimetype="application/json" if response_content else None)
+        response = Response(
+            response_content, status=status_code, headers=headers,
+            mimetype="application/json" if response_content else None)
         if self.sleep_before_request:
             time.sleep(self.sleep_before_request / 1000)
         return response(environ, start_response)
 
     def run(self) -> None:
-        run_simple(self.host, self.port, self, use_reloader=True, reloader_interval=self.reload_interval,
-                   extra_files=self.extra_files)
+        run_simple(
+            self.host, self.port, self, use_reloader=True,
+            reloader_interval=self.reload_interval,
+            extra_files=self.extra_files)
