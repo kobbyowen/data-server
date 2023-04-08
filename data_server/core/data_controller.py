@@ -265,7 +265,8 @@ class DataController:
         ).isoformat()
         return item
 
-    def _get_items(self, data: dt.JSONItems, **filters: t.Any) -> dt.JSONItems:
+    def _get_items(self, data: dt.JSONItems,
+                   **filters: t.Any) -> dt.JSONItems:
         sort_key = filters.pop(self.sort_key_param_name, self.id_name)
         self.order = filters.pop(
             self.order_param_name, dt.SortOrder.ASC.value)

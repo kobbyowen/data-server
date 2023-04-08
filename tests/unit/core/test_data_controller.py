@@ -320,23 +320,33 @@ class TestAutoGenerateId(unittest.TestCase):
         return super().setUp()
 
     def test_auto_generate_int_ids(self) -> None:
-        controller = DataController(self.data_sample_with_ints_ids, autogenerate_id=True)
-        generated_id = controller._autogenerate_id(self.data_sample_with_ints_ids["books"])
+        controller = DataController(
+            self.data_sample_with_ints_ids, autogenerate_id=True)
+        generated_id = controller._autogenerate_id(
+            self.data_sample_with_ints_ids["books"])
         expected_ids = [2, 3]
         self.assertIn(generated_id, expected_ids)
         self.assertNotEqual(generated_id, 1)
 
     @patch("random.randint", side_effect=[1, 20])
-    def test_auto_generate_int_ids_randomly(self, mocked_randint: MagicMock) -> None:
-        controller = DataController(self.data_sample_with_ints_ids, autogenerate_id=True)
-        generated_id = controller._autogenerate_id(self.data_sample_with_ints_ids["books"], use_random=True)
+    def test_auto_generate_int_ids_randomly(
+            self, mocked_randint: MagicMock) -> None:
+        controller = DataController(
+            self.data_sample_with_ints_ids, autogenerate_id=True)
+        generated_id = controller._autogenerate_id(
+            self.data_sample_with_ints_ids["books"], use_random=True)
         self.assertTrue(mocked_randint.called)
         self.assertEqual(generated_id, 20)
 
-    @patch("data_server.core.data_controller.uuid4", side_effect=["10", "10", "20"], return_value="20")
+    @patch("data_server.core.data_controller.uuid4",
+           side_effect=["10", "10", "20"],
+           return_value="20")
     def test_auto_generate_string_ids(self, mocked_uuid: MagicMock) -> None:
-        controller = DataController(self.data_sample_with_ints_ids, autogenerate_id=True, id_name="book_id")
-        generated_id = controller._autogenerate_id(self.data_sample_with_string_ids["books"])
+        controller = DataController(
+            self.data_sample_with_ints_ids, autogenerate_id=True,
+            id_name="book_id")
+        generated_id = controller._autogenerate_id(
+            self.data_sample_with_string_ids["books"])
         self.assertTrue(mocked_uuid.called)
         self.assertIn(generated_id, "20")
 
