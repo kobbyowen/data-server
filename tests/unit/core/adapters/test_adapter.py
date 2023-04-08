@@ -1,7 +1,7 @@
 import unittest
 from typing import Dict, Text, Any
 from data_server.core.adapters.adapter import DataAdapter
-from tests.fake_data import data_sample
+from tests.unit.fake_data import data_sample
 
 
 class TestAdapterInitialization(unittest.TestCase):
@@ -16,8 +16,13 @@ class TestAdapterInitialization(unittest.TestCase):
 
 class TestSplitPath(unittest.TestCase):
     def test_split_path(self) -> None:
-        paths = ["", "/path/to/resource", "path/to/resource", "path/to/resource", "/path/to/resource/"]
-        expected = [[], ["path", "to", "resource"], ["path", "to", "resource"], ["path", "to", "resource"]]
+        paths = ["", "/path/to/resource", "path/to/resource",
+                 "path/to/resource", "/path/to/resource/"]
+        expected = [
+            [],
+            ["path", "to", "resource"],
+            ["path", "to", "resource"],
+            ["path", "to", "resource"]]
 
         for path, expected_result in zip(paths, expected):
             result = DataAdapter._split_paths(path)
@@ -38,7 +43,9 @@ class TestDataAdapterMethods(unittest.TestCase):
 
     def test_execute_get_item_request(self) -> None:
         item = self.adapter.execute_get_item_request("/books", 1)
-        self.assertDictEqual(item, {"id": 1, "author": "Kobby Owen", "title": "Advanced Python"})
+        self.assertDictEqual(
+            item,
+            {"id": 1, "author": "Kobby Owen", "title": "Advanced Python"})
 
     def test_execute_get_request(self) -> None:
         items = self.adapter.execute_get_request("/books")
@@ -48,7 +55,9 @@ class TestDataAdapterMethods(unittest.TestCase):
         data = {"author": "Kobby Owen", "title": "Python In 30 Days"}
         item = self.adapter.execute_post_request("/books", data)
         self.assertLessEqual(data.items(), item.items())
-        self.assertEqual(len(self.adapter.get_data()["books"]), len(data_sample["books"]) + 1)
+        self.assertEqual(
+            len(self.adapter.get_data()["books"]),
+            len(data_sample["books"]) + 1)
 
     def test_execute_patch_request(self) -> None:
         data = {"title": "Python In 30 Days"}
@@ -62,7 +71,9 @@ class TestDataAdapterMethods(unittest.TestCase):
 
     def test_execute_delete_request(self) -> None:
         self.adapter.execute_delete_request("/books", 1)
-        self.assertEqual(len(self.adapter.get_data()["books"]), len(data_sample["books"]) - 1)
+        self.assertEqual(
+            len(self.adapter.get_data()["books"]),
+            len(data_sample["books"]) - 1)
 
     def test_get_data(self) -> None:
         self.assertDictEqual(self.adapter.get_data(), data_sample)
@@ -72,7 +83,9 @@ class TestDataAdapterMethods(unittest.TestCase):
         self.assertListEqual(urls, ["/books"])
         urls = DataAdapter({"index": {"posts": [], "comments": [], "date": {
                            " year": 2000, "month": 11, "day": 15}}}).get_urls()
-        self.assertListEqual(urls, ["/index", "/index/posts", "/index/comments", "/index/date"])
+        self.assertListEqual(
+            urls,
+            ["/index", "/index/posts", "/index/comments", "/index/date"])
 
     def test_get_url_data(self) -> None:
         urls = self.adapter.get_url_data()
