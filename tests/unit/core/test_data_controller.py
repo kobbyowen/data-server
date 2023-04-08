@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch, MagicMock
 from copy import deepcopy
 from data_server.errors import ItemNotFoundError, DuplicateIDFound
 from data_server.core.data_controller import DataController
@@ -278,6 +279,70 @@ class TestReplaceItem(unittest.TestCase):
         controller = DataController(self.data, id_name="test_id")
         with self.assertRaises(ValueError):
             controller.replace_item(["books"], 1, new_data)
+
+
+class TestAutoGenerateId(unittest.TestCase):
+    def setUp(self) -> None:
+        self.data_sample_with_ints_ids = {
+            "books": [
+                {
+                    "id": 1,
+                    "author": "Pius Owen",
+                    "title": "Testing with python"
+                },
+                {
+                    "author": "Pius Owen",
+                    "title": "Testing with python"
+                },
+                {
+                    "author": "Kobby Owen",
+                    "title": "Python in a nutshell"
+                }
+            ]
+        }
+        self.data_sample_with_string_ids = {
+            "books": [
+                {
+                    "author": "Pius Owen",
+                    "title": "Testing with python"
+                },
+                {
+                    "book_id": "10",
+                    "author": "Pius Owen",
+                    "title": "Testing with python"
+                },
+                {
+                    "author": "Kobby Owen",
+                    "title": "Python in a nutshell"
+                }
+            ]
+        }
+        return super().setUp()
+
+    def test_auto_generate_int_ids(self) -> None:
+        controller = DataController(self.data_sample_with_ints_ids, autogenerate_id=True)
+        generated_id = controller._autogenerate_id(self.data_sample_with_ints_ids["books"])
+        expected_ids = [2, 3]
+        self.assertIn(generated_id, expected_ids)
+        self.assertNotEqual(generated_id, 1)
+
+    @patch("random.randint", side_effect=[1, 20])
+    def test_auto_generate_int_ids_randomly(self, mocked_randint: MagicMock) -> None:
+        controller = DataController(self.data_sample_with_ints_ids, autogenerate_id=True)
+        generated_id = controller._autogenerate_id(self.data_sample_with_ints_ids["books"], use_random=True)
+        self.assertTrue(mocked_randint.called)
+        self.assertEqual(generated_id, 20)
+
+    @patch("data_server.core.data_controller.uuid4", side_effect=["10", "10", "20"], return_value="20")
+    def test_auto_generate_string_ids(self, mocked_uuid: MagicMock) -> None:
+        controller = DataController(self.data_sample_with_ints_ids, autogenerate_id=True, id_name="book_id")
+        generated_id = controller._autogenerate_id(self.data_sample_with_string_ids["books"])
+        self.assertTrue(mocked_uuid.called)
+        self.assertIn(generated_id, "20")
+
+
+class TestFixData(unittest.TestCase):
+    pass
 
 
 if __name__ == "__main__":
