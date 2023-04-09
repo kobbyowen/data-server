@@ -418,12 +418,13 @@ class TestFixData(unittest.TestCase):
             ]
         }
 
-        self.data_sample_with_ints_ids = deepcopy(sample_data_1)
-        self.data_sample_with_string_ids = deepcopy(sample_data_2)
-
+        self.data_sample_with_ints_ids = t.cast(
+            dt.JSONItem, deepcopy(sample_data_1))
+        self.data_sample_with_string_ids = t.cast(dt.JSONItem,
+                                                  deepcopy(sample_data_2))
         return super().setUp()
 
-    def test_adding_automatic_integer_ids(self):
+    def test_adding_automatic_integer_ids(self) -> None:
         DataController(
             self.data_sample_with_ints_ids, fix=True, use_timestamps=True)
         for book in self.data_sample_with_ints_ids["books"]:
@@ -438,7 +439,7 @@ class TestFixData(unittest.TestCase):
         }}
         DataController(data, fix=True, use_timestamps=True)
 
-    def test_adding_automatic_string_ids(self):
+    def test_adding_automatic_string_ids(self) -> None:
         DataController(
             self.data_sample_with_string_ids, fix=True, use_timestamps=True)
         for book in self.data_sample_with_string_ids["books"]:
@@ -447,7 +448,7 @@ class TestFixData(unittest.TestCase):
             self.assertIn("updated_at", book)
             self.assertEqual(type(book["id"]), str)
 
-    def test_removing_timestamps(self):
+    def test_removing_timestamps(self) -> None:
         DataController(
             self.data_sample_with_string_ids, fix=True, use_timestamps=False)
         for book in self.data_sample_with_string_ids["books"]:
