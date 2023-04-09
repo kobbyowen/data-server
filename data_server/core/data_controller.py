@@ -198,8 +198,7 @@ class DataController:
             self, data: dt.JSONItem, list_data: dt.JSONItems) -> dt.JSONItem:
         new_id = self._autogenerate_id(list_data=list_data)
         data[self.id_name] = new_id
-        if self.created_at_key_name not in data:
-            self._add_timestamps(data, remove_stamps=True)
+        self._add_timestamps(data, remove_stamps=True)
         return data
 
     def _fix_data(self, data: dt.JSONItem) -> None:
@@ -253,16 +252,17 @@ class DataController:
     def _add_timestamps(
             self, item: dt.JSONItem, update_updated_at: bool = False,
             remove_stamps: bool = False) -> dt.JSONItem:
-        if not self.use_timestamps:
-            if remove_stamps:
-                if self.created_at_key_name in item:
-                    item.pop(self.created_at_key_name)
-                if self.updated_at_key_name in item:
-                    item.pop(self.updated_at_key_name)
+        if not self.use_timestamps and remove_stamps:
+            if self.created_at_key_name in item:
+                item.pop(self.created_at_key_name)
+            if self.updated_at_key_name in item:
+                item.pop(self.updated_at_key_name)
             return item
-        item[self.created_at_key_name] = datetime.now().isoformat()
-        item[self.updated_at_key_name] = None if update_updated_at else datetime.now(
-        ).isoformat()
+        if self.created_at_key_name not in item:
+            item[self.created_at_key_name] = datetime.now().isoformat()
+        if self.updated_at_key_name not in item:
+            item[self.updated_at_key_name] = None if update_updated_at else datetime.now(
+            ).isoformat()
         return item
 
     def _get_items(self, data: dt.JSONItems,
@@ -285,8 +285,8 @@ class DataController:
     def _autogenerate_id(self, list_data: dt.JSONItems, *,
                          use_random: bool = False) -> t.Union[t.Text, int]:
 
-        exclude = list(map(lambda x: t.cast(
-            t.Union[t.Text, int], x.get(self.id_name)), list_data))
+        exclude = list(filter(lambda x: x is not None, map(lambda x: t.cast(
+            t.Union[t.Text, int], x.get(self.id_name)), list_data)))
         data_length = len(list_data)
 
         if self.id_type is int:
@@ -299,7 +299,7 @@ class DataController:
                 if i not in exclude:
                     return i
             count = 0
-            while data_length + count not in exclude:
+            while data_length + count in exclude:
                 count += 1
             return data_length + count
 
