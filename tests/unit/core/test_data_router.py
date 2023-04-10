@@ -40,6 +40,11 @@ class TestDataRouterInitialization(TestCase):
         router = DataRouter("unknown-file")
         self.assertEqual(router.resource_type, "json")
 
+    def test_get_url(self) -> None:
+        router = DataRouter({})
+        router.get_url_data()
+        self.assertTrue(self.adapter_mock.called)
+
 
 class TestDataRouterForGetRequests(TestCase):
     def setUp(self) -> None:
@@ -48,13 +53,27 @@ class TestDataRouterForGetRequests(TestCase):
         json_adapter = patch("data_server.core.data_router.JSONAdapter")
         self.json_adapter_mock = json_adapter.start()
         self.json_adapter_mocked_instance = self.json_adapter_mock.return_value
-        self.json_adapter_mocked_instance.get_urls.return_value = ["/posts", "/book", "/posts/today/noon"]
+        self.json_adapter_mocked_instance.get_urls.return_value = [
+            "/posts", "/book", "/posts/today/noon"]
         self.json_adapter_mocked_instance.get_url_data.return_value = [
             ("/posts", list), ("/book", dict), ("/posts/today/noon/", list)]
         self.json_adapter_mocked_instance.execute_get_item_request.return_value = self.item_response
         self.json_adapter_mocked_instance.execute_get_request.return_value = self.items_response
 
         super().setUp()
+
+    def test_get_request_with_index_url(self) -> None:
+        router = DataRouter("testfile.json")
+        result = router(method="get", url="/")
+        self.assertEqual(
+            result,
+            [{"url": "/posts",
+              "methods":
+              ["GET", "POST", "PUT", "PATCH", "OPTIONS", "DELETE"]},
+             {"url": "/book", "methods": ["GET"]},
+             {"url": "/posts/today/noon/",
+              "methods":
+              ["GET", "POST", "PUT", "PATCH", "OPTIONS", "DELETE"]}])
 
     def test_normal_get_request(self) -> None:
         router = DataRouter("testfile.json")
@@ -86,7 +105,8 @@ class TestDataRouterPostRequest(TestCase):
         json_adapter = patch("data_server.core.data_router.JSONAdapter")
         self.json_adapter_mock = json_adapter.start()
         self.json_adapter_mocked_instance = self.json_adapter_mock.return_value
-        self.json_adapter_mocked_instance.get_urls.return_value = ["/posts", "/book", "/posts/today/noon"]
+        self.json_adapter_mocked_instance.get_urls.return_value = [
+            "/posts", "/book", "/posts/today/noon"]
         self.json_adapter_mocked_instance.get_url_data.return_value = [
             ("/posts", list), ("/book", dict), ("/posts/today/noon/", list)]
         self.json_adapter_mocked_instance.execute_post_request.return_value = self.item_response
@@ -98,7 +118,8 @@ class TestDataRouterPostRequest(TestCase):
         data = {"name": "new-data"}
         result = router(method="post", url="/posts", data=data)
         self.assertDictEqual(t.cast(t.Any, result), self.item_response)
-        self.json_adapter_mocked_instance.execute_post_request.assert_called_with("/posts", data)
+        self.json_adapter_mocked_instance.execute_post_request.assert_called_with(
+            "/posts", data)
 
     def tearDown(self) -> None:
         self.json_adapter_mock.stop()
@@ -111,7 +132,8 @@ class TestDataRouterPatchAndPutRequest(TestCase):
         json_adapter = patch("data_server.core.data_router.JSONAdapter")
         self.json_adapter_mock = json_adapter.start()
         self.json_adapter_mocked_instance = self.json_adapter_mock.return_value
-        self.json_adapter_mocked_instance.get_urls.return_value = ["/posts", "/book", "/posts/today/noon"]
+        self.json_adapter_mocked_instance.get_urls.return_value = [
+            "/posts", "/book", "/posts/today/noon"]
         self.json_adapter_mocked_instance._controller.id_type = int
         self.json_adapter_mocked_instance.get_url_data.return_value = [
             ("/posts", list), ("/book", dict), ("/posts/today/noon/", list)]
@@ -125,14 +147,16 @@ class TestDataRouterPatchAndPutRequest(TestCase):
         data = {"name": "new-data"}
         result = router(method="put", url="/posts/1", data=data)
         self.assertDictEqual(t.cast(t.Any, result), self.item_response)
-        self.json_adapter_mocked_instance.execute_put_request.assert_called_with("/posts", 1, data)
+        self.json_adapter_mocked_instance.execute_put_request.assert_called_with(
+            "/posts", 1, data)
 
     def test_patch_request(self) -> None:
         router = DataRouter("testfile.json")
         data = {"name": "new-data"}
         result = router(method="patch", url="/posts/1", data=data)
         self.assertDictEqual(t.cast(t.Any, result), self.item_response)
-        self.json_adapter_mocked_instance.execute_patch_request.assert_called_with("/posts", 1, data)
+        self.json_adapter_mocked_instance.execute_patch_request.assert_called_with(
+            "/posts", 1, data)
 
     def tearDown(self) -> None:
         self.json_adapter_mock.stop()
@@ -144,7 +168,8 @@ class TestDataRouterDeleteRequest(TestCase):
         json_adapter = patch("data_server.core.data_router.JSONAdapter")
         self.json_adapter_mock = json_adapter.start()
         self.json_adapter_mocked_instance = self.json_adapter_mock.return_value
-        self.json_adapter_mocked_instance.get_urls.return_value = ["/posts", "/book", "/posts/today/noon"]
+        self.json_adapter_mocked_instance.get_urls.return_value = [
+            "/posts", "/book", "/posts/today/noon"]
         self.json_adapter_mocked_instance._controller.id_type = int
         self.json_adapter_mocked_instance.get_url_data.return_value = [
             ("/posts", list), ("/book", dict), ("/posts/today/noon/", list)]
@@ -156,7 +181,8 @@ class TestDataRouterDeleteRequest(TestCase):
         router = DataRouter("testfile.json")
         data = {"name": "new-data"}
         router(method="delete", url="/posts/1", data=data)
-        self.json_adapter_mocked_instance.execute_delete_request.assert_called_with("/posts", 1)
+        self.json_adapter_mocked_instance.execute_delete_request.assert_called_with(
+            "/posts", 1)
 
 
 class TestDataRouter(TestCase):
@@ -164,7 +190,8 @@ class TestDataRouter(TestCase):
         json_adapter = patch("data_server.core.data_router.JSONAdapter")
         self.json_adapter_mock = json_adapter.start()
         self.json_adapter_mocked_instance = self.json_adapter_mock.return_value
-        self.json_adapter_mocked_instance.get_urls.return_value = ["/posts", "/book", "/posts/today/noon"]
+        self.json_adapter_mocked_instance.get_urls.return_value = [
+            "/posts", "/book", "/posts/today/noon"]
         self.json_adapter_mocked_instance._controller.id_type = int
         self.json_adapter_mocked_instance.get_url_data.return_value = [
             ("/posts", list), ("/book", dict), ("/posts/today/noon/", list)]
