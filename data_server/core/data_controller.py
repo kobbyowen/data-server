@@ -1,4 +1,5 @@
 import typing as t
+import random
 from functools import reduce
 from datetime import datetime
 from uuid import uuid4
@@ -10,7 +11,8 @@ import data_server.data_server_types as dt
 class DataController:
     def __init__(
             self, data: t.Dict[t.Text, t.Any],
-            *, id_name: t.Text = "id", sort_key_param_name: t.Text = "sort_by",
+            *, id_name: t.Text = "id", fix: bool = False,
+            sort_key_param_name: t.Text = "sort_by",
             order_param_name: t.Text = "order", page_param_name: t.Text = "page",
             size_param_name: t.Text = "size", default_page_size: int = 10,
             autogenerate_id: bool = False, use_timestamps: bool = False,
@@ -49,11 +51,14 @@ class DataController:
         self.default_page_size = default_page_size
         self.auto_generate_id = autogenerate_id
         self.use_timestamps = use_timestamps
-        self.created_at_timestamp_name = created_at_key_name
+        self.created_at_key_name = created_at_key_name
         self.updated_at_key_name = updated_at_key_name
         self.id_type = self._get_id_type(data)
         assert isinstance(
             self.data, dict), f"data must be of type dict not {type(self.data)}"
+        self.fix = fix
+        if (self.fix):
+            self._fix_data(self.data)
 
     def get_items(self, path: dt.ItemPath, **filters: t.Any) -> dt.JSONItems:
         """Retrieve a list of items from data
@@ -162,7 +167,7 @@ class DataController:
                 raise DuplicateIDFound(
                     f"an item exists with same id {data[self.id_name]}")
         if self.auto_generate_id and self.id_name not in data:
-            data[self.id_name] = self._autogenerate_id(len(items))
+            data[self.id_name] = self._autogenerate_id(items)
         data = self._add_timestamps(data)
         items.append(data)
         return data
@@ -188,6 +193,21 @@ class DataController:
             else:
                 new_data.append(item)
         return new_data
+
+    def _fix_data_item(
+            self, data: dt.JSONItem, list_data: dt.JSONItems) -> dt.JSONItem:
+        new_id = self._autogenerate_id(list_data=list_data)
+        data[self.id_name] = new_id
+        self._add_timestamps(data, remove_stamps=True)
+        return data
+
+    def _fix_data(self, data: dt.JSONItem) -> None:
+        for value in data.values():
+            if isinstance(value, list):
+                for data in value:
+                    self._fix_data_item(data, value)
+            if isinstance(value, dict):
+                self._fix_data(value)
 
     def _get_item_parent_and_index(
             self, path: dt.ItemPath, id: dt.IdType) -> t.Tuple[
@@ -229,15 +249,24 @@ class DataController:
         item[self.updated_at_key_name] = datetime.now().isoformat()
         return item
 
-    def _add_timestamps(self, item: dt.JSONItem, update_updated_at: bool = False) -> dt.JSONItem:
-        if not self.use_timestamps:
+    def _add_timestamps(
+            self, item: dt.JSONItem, update_updated_at: bool = False,
+            remove_stamps: bool = False) -> dt.JSONItem:
+        if not self.use_timestamps and remove_stamps:
+            if self.created_at_key_name in item:
+                item.pop(self.created_at_key_name)
+            if self.updated_at_key_name in item:
+                item.pop(self.updated_at_key_name)
             return item
-        item[self.created_at_timestamp_name] = datetime.now().isoformat()
-        item[self.updated_at_key_name] = None if update_updated_at else datetime.now(
-        ).isoformat()
+        if self.created_at_key_name not in item:
+            item[self.created_at_key_name] = datetime.now().isoformat()
+        if self.updated_at_key_name not in item:
+            item[self.updated_at_key_name] = None if update_updated_at else datetime.now(
+            ).isoformat()
         return item
 
-    def _get_items(self, data: dt.JSONItems, **filters: t.Any) -> dt.JSONItems:
+    def _get_items(self, data: dt.JSONItems,
+                   **filters: t.Any) -> dt.JSONItems:
         sort_key = filters.pop(self.sort_key_param_name, self.id_name)
         self.order = filters.pop(
             self.order_param_name, dt.SortOrder.ASC.value)
@@ -253,7 +282,28 @@ class DataController:
         end_index = start_index + int(self.size)
         return new_data[start_index:end_index]
 
-    def _autogenerate_id(self, data_length: int) -> t.Union[t.Text, int]:
+    def _autogenerate_id(self, list_data: dt.JSONItems, *,
+                         use_random: bool = False) -> t.Union[t.Text, int]:
+
+        exclude = list(filter(lambda x: x is not None, map(lambda x: t.cast(
+            t.Union[t.Text, int], x.get(self.id_name)), list_data)))
+        data_length = len(list_data)
+
         if self.id_type is int:
-            return data_length + 1
-        return str(uuid4())
+            if use_random:
+                random_int = random.randint(0, 100_000_000)
+                while random_int in exclude:
+                    random_int = random.randint(0, 100_000_000)
+                return random_int
+            for i in range(1, data_length):
+                if i not in exclude:
+                    return i
+            count = 0
+            while data_length + count in exclude:
+                count += 1
+            return data_length + count
+
+        string_id = str(uuid4())
+        while string_id in exclude:
+            string_id = str(uuid4())
+        return string_id

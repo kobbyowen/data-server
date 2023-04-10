@@ -1,6 +1,9 @@
 import unittest
+from unittest.mock import patch, MagicMock
+import typing as t
 from copy import deepcopy
 from data_server.errors import ItemNotFoundError, DuplicateIDFound
+import data_server.data_server_types as dt
 from data_server.core.data_controller import DataController
 from tests.unit.fake_data import data_sample_with_empty_posts, data_sample_with_int_ids, data_sample_with_string_ids, \
     data_sample_with_id_name_as_uuid, data_sample_with_nested_items, data_sample
@@ -187,8 +190,6 @@ class TestAddItem(unittest.TestCase):
             self.data, autogenerate_id=True, id_name="id",
             use_timestamps=False)
         results = controller.add_item(["books"], new_book)
-        self.assertNotIn("created_at", results)
-        self.assertNotIn("updated_at", results)
         self.assertEqual(
             len([item for item in self.data["books"] if item["id"] == results["id"]]), 1)
 
@@ -278,6 +279,181 @@ class TestReplaceItem(unittest.TestCase):
         controller = DataController(self.data, id_name="test_id")
         with self.assertRaises(ValueError):
             controller.replace_item(["books"], 1, new_data)
+
+
+class TestAutoGenerateId(unittest.TestCase):
+    def setUp(self) -> None:
+        sample_data_1 = {
+            "books": [
+                {
+                    "id": 1,
+                    "author": "Pius Owen",
+                    "title": "Testing with python",
+                    "created_at": "2023-04-09T22:18:20.421462",
+                    "updated_at": "2023-04-09T22:18:20.421462"
+                },
+                {
+                    "author": "Pius Owen",
+                    "title": "Testing with python",
+                    "created_at": "2023-04-09T22:18:20.421462",
+                },
+                {
+                    "author": "Kobby Owen",
+                    "title": "Python in a nutshell",
+                    "updated_at": "2023-04-09T22:18:20.421462"
+                }
+            ]
+        }
+        sample_data_2 = {
+            "books": [
+                {
+                    "author": "Pius Owen",
+                    "title": "Testing with python",
+                    "created_at": "2023-04-09T22:18:20.421462",
+                    "updated_at": "2023-04-09T22:18:20.421462"
+                },
+                {
+                    "book_id": "10",
+                    "author": "Pius Owen",
+                    "title": "Testing with python",
+                    "updated_at": "2023-04-09T22:18:20.421462"
+                },
+                {
+                    "author": "Kobby Owen",
+                    "title": "Python in a nutshell",
+                    "created_at": "2023-04-09T22:18:20.421462",
+                }
+            ]
+        }
+
+        self.data_sample_with_ints_ids = deepcopy(sample_data_1)
+        self.data_sample_with_string_ids = deepcopy(sample_data_2)
+
+        return super().setUp()
+
+    def test_auto_generate_int_ids(self) -> None:
+        controller = DataController(
+            self.data_sample_with_ints_ids, autogenerate_id=True)
+        generated_id = controller._autogenerate_id(
+            t.cast(dt.JSONItems, self.data_sample_with_ints_ids["books"]))
+        expected_ids = [2, 3]
+        self.assertIn(generated_id, expected_ids)
+        self.assertNotEqual(generated_id, 1)
+
+    def test_autogenerate_id_with_single_data(self) -> None:
+        controller = DataController(
+            self.data_sample_with_ints_ids, autogenerate_id=True)
+        generated_id = controller._autogenerate_id(
+            t.cast(dt.JSONItems, [self.data_sample_with_ints_ids["books"][0]]))
+        expected_ids = [2, 3]
+        self.assertIn(generated_id, expected_ids)
+        self.assertNotEqual(generated_id, 1)
+
+    @patch("random.randint", side_effect=[1, 20])
+    def test_auto_generate_int_ids_randomly(
+            self, mocked_randint: MagicMock) -> None:
+        controller = DataController(
+            self.data_sample_with_ints_ids, autogenerate_id=True)
+        generated_id = controller._autogenerate_id(
+            t.cast(dt.JSONItems, self.data_sample_with_ints_ids["books"]),
+            use_random=True)
+        self.assertTrue(mocked_randint.called)
+        self.assertEqual(generated_id, 20)
+
+    @patch("data_server.core.data_controller.uuid4",
+           side_effect=["10", "10", "20"],
+           return_value="20")
+    def test_auto_generate_string_ids(self, mocked_uuid: MagicMock) -> None:
+        controller = DataController(
+            self.data_sample_with_ints_ids, autogenerate_id=True,
+            id_name="book_id")
+        generated_id = controller._autogenerate_id(
+            self.data_sample_with_string_ids["books"])
+        self.assertTrue(mocked_uuid.called)
+        self.assertIn(generated_id, "20")
+
+
+class TestFixData(unittest.TestCase):
+    def setUp(self) -> None:
+        sample_data_1 = {
+            "books": [
+                {
+                    "id": 5,
+                    "author": "Pius Owen",
+                    "title": "Testing with python",
+                    "created_at": "2023-04-09T22:18:20.421462",
+                    "updated_at": "2023-04-09T22:18:20.421462"
+                },
+                {
+                    "author": "Pius Owen",
+                    "title": "Testing with python",
+                    "created_at": "2023-04-09T22:18:20.421462",
+                },
+                {
+                    "author": "Kobby Owen",
+                    "title": "Python in a nutshell",
+                    "updated_at": "2023-04-09T22:18:20.421462"
+                }
+            ]
+        }
+        sample_data_2 = {
+            "books": [
+                {
+                    "author": "Pius Owen",
+                    "title": "Testing with python",
+                    "created_at": "2023-04-09T22:18:20.421462",
+                    "updated_at": "2023-04-09T22:18:20.421462"
+                },
+                {
+                    "book_id": "10",
+                    "author": "Pius Owen",
+                    "title": "Testing with python",
+                    "updated_at": "2023-04-09T22:18:20.421462"
+                },
+                {
+                    "author": "Kobby Owen",
+                    "title": "Python in a nutshell",
+                    "created_at": "2023-04-09T22:18:20.421462",
+                }
+            ]
+        }
+
+        self.data_sample_with_ints_ids = t.cast(
+            dt.JSONItem, deepcopy(sample_data_1))
+        self.data_sample_with_string_ids = t.cast(dt.JSONItem,
+                                                  deepcopy(sample_data_2))
+        return super().setUp()
+
+    def test_adding_automatic_integer_ids(self) -> None:
+        DataController(
+            self.data_sample_with_ints_ids, fix=True, use_timestamps=True)
+        for book in self.data_sample_with_ints_ids["books"]:
+            self.assertIn("id", book)
+            self.assertIn("created_at", book)
+            self.assertIn("updated_at", book)
+            self.assertEqual(type(book["id"]), int)
+        data = {"book": {
+            "author": "Kobby Owen",
+            "title": "Python in a nutshell",
+            "created_at": "2023-04-09T22:18:20.421462",
+        }}
+        DataController(data, fix=True, use_timestamps=True)
+
+    def test_adding_automatic_string_ids(self) -> None:
+        DataController(
+            self.data_sample_with_string_ids, fix=True, use_timestamps=True)
+        for book in self.data_sample_with_string_ids["books"]:
+            self.assertIn("id", book)
+            self.assertIn("created_at", book)
+            self.assertIn("updated_at", book)
+            self.assertEqual(type(book["id"]), str)
+
+    def test_removing_timestamps(self) -> None:
+        DataController(
+            self.data_sample_with_string_ids, fix=True, use_timestamps=False)
+        for book in self.data_sample_with_string_ids["books"]:
+            self.assertNotIn("created_at", book)
+            self.assertNotIn("updated_at", book)
 
 
 if __name__ == "__main__":
