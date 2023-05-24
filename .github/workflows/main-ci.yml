@@ -35,7 +35,11 @@ jobs:
           mypy --strict .
       - name: Run Unit Tests
         run: |
-          coverage run --source . -m unittest discover -v
+          coverage run --source . -m unittest discover -v -s tests/unit
+      - name: Run Integration Tests
+        run: |
+          coverage run --source . -m unittest discover -v -s tests/int
+
       - name: Run Coverage Reports
         run: |
           coverage report --skip-empty -m --fail-under=100 --omit="tests/*"
