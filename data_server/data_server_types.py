@@ -15,11 +15,14 @@ ItemPath = t.List[t.Text]
 
 ReponseHeaders = t.Dict[t.Text, t.Text]
 
+RequestHeaders = t.Dict[t.Text, t.Text]
+
 RouterResponse = t.Union[JSONItem, JSONItems]
 
-RequestHandler = t.Callable[[t.Text, t.Text, t.Optional[t.Dict[t.Text, t.Text]],  t.Optional[JSONItem]], RouterResponse]
-
-RequestHeaders = t.Dict[t.Text, t.Text]
+RequestHandler = t.Callable[[t.Text, t.Text, t.Optional
+                             [t.Dict[t.Text, t.Text]],
+                             t.Optional[JSONItem]],
+                            RouterResponse]
 
 
 class ResourceType(str, Enum):

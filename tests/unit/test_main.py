@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from main import main
+from main import create_server
 
 
 class TestMain(unittest.TestCase):
@@ -20,7 +20,7 @@ class TestMain(unittest.TestCase):
             "updated_at_key_name": "updated_at", "page_size": 10,
             "url_path_prefix": "/", "host": "localhost", "port": 2020,
             "static_url_prefix": "static", "additional_headers": "",
-            "sleep_before_request": 10, }
+            "sleep_before_request": 10, "disable_stdin": None}
         self.server_instance = self.server_mock.return_value
         self.server_instance.run.return_value = None
         self.data_router_instance = self.data_router_mock.return_value
@@ -33,7 +33,8 @@ class TestMain(unittest.TestCase):
         super().tearDown()
 
     def test_main(self) -> None:
-        main()
+        server = create_server()
+        server.run()
         self.assertTrue(
             self.argument_parser_instance.get_parsed_arguments.called)
         self.assertTrue(

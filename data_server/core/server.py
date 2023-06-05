@@ -1,7 +1,9 @@
 import typing as t
 import json
 import time
+import sys
 import warnings
+import multiprocessing
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Request, Response
 from data_server.errors import DataServerError, ItemNotFoundError
@@ -11,13 +13,14 @@ URL_SEPARATOR = "/"
 
 
 class Server:
-    def __init__(self, request_handler: dt.RequestHandler, *,
-                 url_path_prefix: t.Text = "", host: t.Text = "127.0.0.1",
-                 port: int = 5000, reload_interval: int = 1,
-                 static_folder: t.Optional[t.Text] = None,
-                 static_url_prefix: t.Text = "static",
-                 additional_headers: t.Text = "", sleep_before_request: int = 0,
-                 extra_files: t.Optional[t.List[t.Text]] = None) -> None:
+    def __init__(
+            self, request_handler: dt.RequestHandler, *,
+            url_path_prefix: t.Text = "", host: t.Text = "127.0.0.1",
+            disable_stdin: t.Optional[bool] = None, port: int = 5000,
+            reload_interval: int = 1, static_folder: t.Optional[t.Text] = None,
+            static_url_prefix: t.Text = "static", additional_headers: t.Text = "",
+            sleep_before_request: int = 0, extra_files: t.Optional
+            [t.List[t.Text]] = None) -> None:
         self.request_handler = request_handler
         self.url_path_prefix = url_path_prefix
         self.host = host
@@ -26,6 +29,7 @@ class Server:
         self.static_folder = static_folder
         self.static_url_folder = static_url_prefix
         self.extra_files = extra_files or []
+        self.server_process: t.Optional[multiprocessing.Process] = None
         try:
             self.additional_headers = self._parse_additional_headers(
                 additional_headers)
@@ -33,6 +37,8 @@ class Server:
             warnings.warn(f"Failed to parse headers {e.args}")
             self.additional_headers = {}
         self.sleep_before_request = sleep_before_request
+        if disable_stdin:
+            sys.stdin = None
 
     def _parse_additional_headers(self, headers_as_text: t.Text) -> t.Dict[t.Text, t.Text]:
         if not headers_as_text:
@@ -47,14 +53,14 @@ class Server:
         return all_headers
 
     def _handle_error_response(self, exception: Exception) -> t.Tuple[dt.JSONItem, int, dt.RequestHeaders]:
-        def construct_erorr_response(message: t.Text, code: int, details: t.Any) -> dt.JSONItem: return (
+        def construct_error_response(message: t.Text, code: int, details: t.Any) -> dt.JSONItem: return (
             {"error": {"description": message, "code": code, "details": details}})
 
         if isinstance(exception, DataServerError):
-            return construct_erorr_response(
+            return construct_error_response(
                 exception.description, exception.code, ", ".join(
                     map(str, exception.args))), exception.code, {}
-        return construct_erorr_response(
+        return construct_error_response(
             ", ".join(map(str, exception.args)),
             500, None), 500, {}
 
@@ -112,8 +118,20 @@ class Server:
             time.sleep(self.sleep_before_request / 1000)
         return response(environ, start_response)
 
-    def run(self) -> None:
+    def _run(self) -> None:
         run_simple(
             self.host, self.port, self, use_reloader=True,
             reloader_interval=self.reload_interval,
             extra_files=self.extra_files)
+
+    def run(self) -> None:
+        # self.server_process = multiprocessing.Process(target=self._run)
+        # self.server_process.start()
+        # self.server_process.join()
+        self._run()
+
+    def shutdown(self) -> None:
+        # if self.server_process is None:
+        #     raise RuntimeError('Server is not started') from None
+        # self.server_process.terminate()
+        pass
