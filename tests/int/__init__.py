@@ -1,6 +1,7 @@
 import unittest
 import time
 import os
+import random
 import typing as t
 from .utils import TestServer, TestClient
 
@@ -21,7 +22,7 @@ class IntegrationTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        port = 4580
+        port = random.randrange(10000, 60000)
         cls.server = TestServer(port)
         cls.server_file = cls.create_json_file()
         cls.server.server_file = cls.server_file
