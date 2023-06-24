@@ -44,6 +44,18 @@ class TestServerInitialization(TestCase):
         mocked_run.assert_called_with(
             "localhost", 6000, server, use_reloader=True, reloader_interval=20,
             extra_files=[])
+        server.shutdown()
+
+    @patch("data_server.core.server.logging.getLogger")
+    def test_initialization_with_disabled_logs_and_stdin(
+            self, mocked_logger: MagicMock) -> None:
+        mocked_logger.level = 20
+        mocked_logger.setLevel.return_value = None
+        server = Server(
+            default_handler,
+            disable_logs=True, disable_stdin=True)
+        mocked_logger.setLevel.assert_called
+        server.shutdown()
 
 
 class TestRequesthandling(TestCase):

@@ -108,7 +108,6 @@ class DataRouter:
                  data: t.Optional[dt.JSONItem] = None) -> dt.RouterResponse:
         method = method.upper()
         url = URL_SEPARATOR + url.strip(URL_SEPARATOR)
-        method = method.upper()
         results = self._handle_http_request(
             method, url, query_parameters=query_parameters, data=data)
         return results

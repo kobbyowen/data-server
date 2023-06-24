@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import typing as t
 from copy import deepcopy
-from data_server.errors import ItemNotFoundError, DuplicateIDFound
+from data_server.errors import ItemNotFoundError, DuplicateIDFound, DataControllerError
 import data_server.data_server_types as dt
 from data_server.core.data_controller import DataController
 from tests.unit.fake_data import data_sample_with_empty_posts, data_sample_with_int_ids, data_sample_with_string_ids, \
@@ -109,6 +109,14 @@ class TestGetItems(unittest.TestCase):
             controller.get_item(["posts", "comments", "self"], 1)
         with self.assertRaises(ItemNotFoundError):
             controller.get_item(["posts", "comment", "all"], 1)
+
+    def test_get_items_with_non_integer_page_param(self) -> None:
+        controller = DataController(data_sample)
+        page_arguments = ["A", 1, -1, 1]
+        size_arguments = [2, "A", 2, -2]
+        for page, size in zip(page_arguments, size_arguments):
+            with self.assertRaises(DataControllerError):
+                controller.get_items(["books"], page=page, size=size)
 
 
 class TestDeleteItem(unittest.TestCase):

@@ -235,7 +235,7 @@ class DataController:
                 dt.JSONItem, prev[cur]), path, self.data)
             return value
         except KeyError:
-            raise ItemNotFoundError(f"{path} could not be resloved in data")
+            raise ItemNotFoundError(f"{path} could not be resolved in data")
 
     def _get_item_by_path_and_id(
             self, path: dt.ItemPath, id: dt.IdType) -> dt.JSONItem:

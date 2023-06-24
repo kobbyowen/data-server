@@ -8,6 +8,13 @@ from http.client import HTTPConnection
 import data_server.data_server_types as dt
 
 
+class Order(t.TypedDict):
+    key: str
+    orderName: str
+    orderNumber: int
+    createdAt: str
+
+
 class ClientResponse(t.TypedDict):
     status: int
     reason: t.Text
@@ -20,7 +27,7 @@ class TestServer:
     def __init__(
             self, port: int,
             server_file: t.Text = "tests/int/fixtures/server-data.json") -> None:
-        self.process = None
+        self.process: t.Optional[subprocess.Popen[bytes]] = None
         self.server_file = server_file
         self.port = port
         self.id_name = "key"
@@ -47,7 +54,7 @@ class TestServer:
         --order-param-name={self.order_param_name} --size-param-name={self.size_param_name} \
         --created-at-key-name={self.created_at_param_name} --updated-at-key-name={self.updated_at_param_name} \
         --id-name={self.id_name} {'--auto-generate-ids=true' if self.auto_generate_id else ''} \
-        {'--use-timestamps=true' if self.use_timestamps else ''} --disable-stdin=true"
+        {'--use-timestamps=true' if self.use_timestamps else ''} --disable-stdin=true --disable-logs=true"
         self.process = subprocess.Popen(self.command, shell=True)
 
     def stop(self) -> None:
@@ -119,7 +126,7 @@ class TestClient:
 def generate_order(
         *, id_name: t.Text = "id", id_type: type = int, add_timestamps: bool = True,
         created_at_key: t.Text = "createdAt", updated_at_key: t.Text = "updatedAt",
-        **kwargs: t.Any) -> t.Dict[t.Text, t.Any]:
+        **kwargs: t.Any) -> Order:
     random_number_upper_limit = 2 ** 64
     order_data = {
         id_name: randint(0, random_number_upper_limit)
@@ -130,4 +137,4 @@ def generate_order(
         order_data[created_at_key] = str(datetime.now())
         order_data[updated_at_key] = None
 
-    return {**order_data, **kwargs}
+    return t.cast(Order, {**order_data, **kwargs})

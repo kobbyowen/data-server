@@ -22,6 +22,9 @@ class ArgumentParser:
         # this prevents werkzeug from throwing an error
         self._arg_parser.add_argument(
             "--disable-stdin", type=bool, default=False, help=argparse.SUPPRESS)
+        self._arg_parser.add_argument(
+            "--disable-logs", type=bool, default=False, help=argparse.SUPPRESS)
+
         self.parsed_args = self._arg_parser.parse_args()
 
     def _add_server_arguments(self) -> None:
@@ -139,5 +142,5 @@ class ArgumentParser:
         args.update(
             self.extract_keys(
                 dict(self.parsed_args._get_kwargs()),
-                ["disable_stdin"]))
+                ["disable_stdin", "disable_logs"]))
         return args

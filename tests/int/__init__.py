@@ -7,6 +7,14 @@ from .utils import TestServer, TestClient
 
 class IntegrationTestCase(unittest.TestCase):
 
+    server: t.Optional[TestServer] = None
+    client: t.Optional[TestClient] = None
+
+    def __init__(self, methodName: str = "runTest") -> None:
+        super().__init__(methodName)
+
+        self.server_file: str = ""
+
     @classmethod
     def create_json_file(cls) -> t.Text:
         return "tests/int/fixtures/server-data.json"
@@ -14,7 +22,6 @@ class IntegrationTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         port = 4580
-
         cls.server = TestServer(port)
         cls.server_file = cls.create_json_file()
         cls.server.server_file = cls.server_file
@@ -35,3 +42,15 @@ class IntegrationTestCase(unittest.TestCase):
         # give server time to cleanup
         time.sleep(1)
         cls.delete_json_file()
+
+    @classmethod
+    def _get_client(cls) -> TestClient:
+        if cls.client:
+            return cls.client
+        raise ValueError("client is not configured")
+
+    @classmethod
+    def _get_server(cls) -> TestServer:
+        if cls.server:
+            return cls.server
+        raise ValueError("server is not configured")
