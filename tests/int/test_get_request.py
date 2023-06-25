@@ -15,9 +15,6 @@ class GetRequestTestCase(IntegrationTestCase):
         return super().setUpClass()
 
     def setUp(self) -> None:
-        self.image_samples_directory = "tests/integration/fixtures/image-samples"
-        self.grayscale_image_path = "tests/integration/fixtures/image-samples/grayscale"
-        self.dark_image_path = "tests/integration/fixtures/image-samples/dark"
         self.client: TestClient = self._get_client()
         self.server: TestServer = self._get_server()
         return super().setUp()
