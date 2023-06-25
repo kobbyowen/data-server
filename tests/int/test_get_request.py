@@ -1,17 +1,27 @@
 import json
 import time
 import typing as t
-from pprint import pprint
 from tests.int import IntegrationTestCase
-from tests.int.utils import generate_order
+from tests.int.utils import generate_order, TestClient, TestServer, Order
 
 
 class GetRequestTestCase(IntegrationTestCase):
 
-    orders = []
+    orders: t.List[Order] = []
+    sorted_orders: t.List[Order] = []
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        return super().setUpClass()
+
+    def setUp(self) -> None:
+        self.client: TestClient = self._get_client()
+        self.server: TestServer = self._get_server()
+        return super().setUp()
 
     @classmethod
     def create_json_file(cls) -> t.Text:
+        cls.server = cls.server
         cls.orders = [
             generate_order(
                 id_name=cls.server.id_name,
@@ -20,7 +30,7 @@ class GetRequestTestCase(IntegrationTestCase):
                 add_timestamps=cls.server.use_timestamps)
             for _ in [None] * 30]
         cls.sorted_orders = cls.orders[:]
-        cls.sorted_orders.sort(key=lambda order: order[cls.server.id_name])
+        cls.sorted_orders.sort(key=lambda order: order["key"])
         json_data = {"orders": cls.orders}
         server_file = f"tests/int/fixtures/{int(time.time() * 1000000)}.json"
         with open(server_file, "w") as opened_server_file:
@@ -139,7 +149,6 @@ class TestSortedGetRequest(GetRequestTestCase):
     def test_get_request_with_an_invalid_sort_key(self) -> None:
         response = self.client.get(
             f"/api/v3/orders?{self.server.sort_param_name}=noAttribute")
-        pprint(response["json"])
         sorted_orders = self.orders[:]
         sorted_orders.sort(key=lambda order: order["createdAt"])
         self.assertEqual(response["status"], 200)

@@ -36,7 +36,7 @@ class TestArgumentParser(TestCase):
         sys.argv = ["argument_parser.py", "file",
                     "--url-path-prefix", "/api/v3", "--use-timestamps", "True"]
         parser = ArgumentParser("test", "Testing", "Testing Epilog")
-        self.assertEqual(len(parser.get_parsed_arguments()), 19)
+        self.assertEqual(len(parser.get_parsed_arguments()), 20)
         self.assertEqual(parser.get_parsed_arguments()[
                          "url_path_prefix"], "/api/v3")
         self.assertTrue(parser.get_parsed_arguments()["use_timestamps"])

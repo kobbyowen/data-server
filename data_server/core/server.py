@@ -4,6 +4,7 @@ import time
 import sys
 import warnings
 import multiprocessing
+import logging
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Request, Response
 from data_server.errors import DataServerError, ItemNotFoundError
@@ -13,15 +14,16 @@ URL_SEPARATOR = "/"
 
 
 class Server:
-    def __init__(
-            self, request_handler: dt.RequestHandler, *,
-            url_path_prefix: t.Text = "", host: t.Text = "127.0.0.1",
-            disable_stdin: t.Optional[bool] = None, port: int = 5000,
-            reload_interval: int = 1, static_folder: t.Optional[t.Text] = None,
-            static_url_prefix: t.Text = "static", additional_headers: t.Text = "",
-            sleep_before_request: int = 0, extra_files: t.Optional
-            [t.List[t.Text]] = None) -> None:
+    def __init__(self, request_handler: dt.RequestHandler, *,
+                 url_path_prefix: t.Text = "", host: t.Text = "127.0.0.1",
+                 disable_stdin: t.Optional[bool] = None,
+                 disable_logs: t.Optional[bool] = None, port: int = 5000,
+                 reload_interval: int = 1, additional_headers: t.Text = "",
+                 static_folder: t.Optional[t.Text] = None, static_url_prefix: t.Text = "static",
+                 sleep_before_request: int = 0,
+                 extra_files: t.Optional[t.List[t.Text]] = None) -> None:
         self.request_handler = request_handler
+        self._werkzeug_logger = logging.getLogger('werkzeug')
         self.url_path_prefix = url_path_prefix
         self.host = host
         self.port = port
@@ -29,7 +31,9 @@ class Server:
         self.static_folder = static_folder
         self.static_url_folder = static_url_prefix
         self.extra_files = extra_files or []
+        self.stdin_handle: t.Optional[t.TextIO] = sys.stdin
         self.server_process: t.Optional[multiprocessing.Process] = None
+        self._initial_log_level = self._werkzeug_logger.level
         try:
             self.additional_headers = self._parse_additional_headers(
                 additional_headers)
@@ -38,7 +42,10 @@ class Server:
             self.additional_headers = {}
         self.sleep_before_request = sleep_before_request
         if disable_stdin:
-            sys.stdin = None
+            # needed for werkzeug , to spin the server in a subprocess
+            self.stdin_handle = None
+        if disable_logs:
+            self._werkzeug_logger.setLevel(logging.ERROR)
 
     def _parse_additional_headers(self, headers_as_text: t.Text) -> t.Dict[t.Text, t.Text]:
         if not headers_as_text:
@@ -101,9 +108,8 @@ class Server:
             return self._encode_response_content(response_content), code, headers
         return self._encode_response_content(response_content), 200, {}
 
-    def _update_headers(self, headers: dt.RequestHeaders, use_cors: bool = True) -> dt.RequestHeaders:
-        if use_cors:
-            headers.update({"Access-Control-Allow-Origin": "*"})
+    def _update_headers(self, headers: dt.RequestHeaders) -> dt.RequestHeaders:
+        headers.update({"Access-Control-Allow-Origin": "*"})
         headers.update(self.additional_headers)
         return headers
 
@@ -134,4 +140,4 @@ class Server:
         # if self.server_process is None:
         #     raise RuntimeError('Server is not started') from None
         # self.server_process.terminate()
-        pass
+        self._werkzeug_logger.setLevel(self._initial_log_level)

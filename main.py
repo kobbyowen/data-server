@@ -28,6 +28,7 @@ def create_server() -> Server:
     server = Server(request_handler=request_handler,
                     url_path_prefix=arguments["url_path_prefix"],
                     disable_stdin=arguments["disable_stdin"],
+                    disable_logs=arguments["disable_logs"],
                     host=arguments["host"],
                     port=arguments["port"],
                     static_url_prefix=arguments["static_url_prefix"],
@@ -38,7 +39,7 @@ def create_server() -> Server:
     return server
 
 
-if __name__ == "__main__":
+def run_server() -> None:
     server = None
     try:
         server = create_server()
@@ -48,3 +49,7 @@ if __name__ == "__main__":
     finally:
         if server:
             server.shutdown()
+
+
+if __name__ == "__main__":
+    run_server()

@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
-from main import create_server
+from data_server.errors import DataServerError
+from main import create_server, run_server
 
 
 class TestMain(unittest.TestCase):
@@ -20,9 +21,10 @@ class TestMain(unittest.TestCase):
             "updated_at_key_name": "updated_at", "page_size": 10,
             "url_path_prefix": "/", "host": "localhost", "port": 2020,
             "static_url_prefix": "static", "additional_headers": "",
-            "sleep_before_request": 10, "disable_stdin": None}
+            "sleep_before_request": 10, "disable_stdin": None, "disable_logs": None}
         self.server_instance = self.server_mock.return_value
         self.server_instance.run.return_value = None
+        self.server_instance.shutdown.return_value = None
         self.data_router_instance = self.data_router_mock.return_value
         super().setUp()
 
@@ -39,3 +41,12 @@ class TestMain(unittest.TestCase):
             self.argument_parser_instance.get_parsed_arguments.called)
         self.assertTrue(
             self.server_instance.run.called)
+
+    def test_run_server_throwing_exception(self) -> None:
+        self.server_instance.run.side_effect = DataServerError(
+            "Failed to start server")
+        self.server_instance.__bool__.return_value = False
+        run_server()
+        self.server_instance.__bool__.return_value = True
+        run_server()
+        self.server_instance.shutdown.assert_called_once
