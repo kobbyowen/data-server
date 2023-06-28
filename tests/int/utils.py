@@ -1,5 +1,6 @@
 import subprocess
 import json
+from distutils import spawn
 from random import randint
 from datetime import datetime
 from uuid import uuid4
@@ -15,6 +16,10 @@ class Order(t.TypedDict):
     createdAt: str
 
 
+def command_exists(command: t.Text) -> bool:
+    return spawn.find_executable(command) is not None
+
+
 class ClientResponse(t.TypedDict):
     status: int
     reason: t.Text
@@ -25,8 +30,8 @@ class ClientResponse(t.TypedDict):
 
 class TestServer:
     def __init__(
-            self, port: int,
-            server_file: t.Text = "tests/int/fixtures/server-data.json") -> None:
+        self, port: int, server_file: t.Text = "tests/int/fixtures/server-data.json"
+    ) -> None:
         self.process: t.Optional[subprocess.Popen[bytes]] = None
         self.server_file = server_file
         self.port = port
@@ -47,7 +52,8 @@ class TestServer:
         self.command = ""
 
     def run(self) -> None:
-        self.command = f"python3 -m main {self.server_file} \
+        python_command = "python" if command_exists("python") else "python3"
+        self.command = f"{python_command} main.py {self.server_file} \
         --host=0.0.0.0  --port={self.port} --url-path-prefix={self.url_path_prefix} \
         --additional-headers='{self.additional_headers}' \
         --page-size={self.page_size} --page-param-name={self.page_param_name} --sort-param-name={self.sort_param_name} \
@@ -68,9 +74,12 @@ class TestClient:
         self.port = port
 
     def _make_request(
-            self, method: dt.HTTPMethod, url: t.Text, data: t.Optional
-            [t.Dict[t.Any, t.Any]] = None, headers: t.Optional
-            [dt.RequestHeaders] = None) -> ClientResponse:
+        self,
+        method: dt.HTTPMethod,
+        url: t.Text,
+        data: t.Optional[t.Dict[t.Any, t.Any]] = None,
+        headers: t.Optional[dt.RequestHeaders] = None,
+    ) -> ClientResponse:
         connection = HTTPConnection(f"{self.host}:{self.port}")
         arguments: t.List[t.Any] = [method.value, url]
         if data:
@@ -87,52 +96,82 @@ class TestClient:
             "reason": response.reason,
             "headers": dict(response.getheaders()),
             "data": response_data,
-            "json": json.loads(response_data)
+            "json": json.loads(response_data),
         }
 
-    def get(self, url: t.Text, *, data: t.Optional
-            [t.Dict[t.Any, t.Any]] = None, headers: t.Optional
-            [dt.RequestHeaders] = None) -> ClientResponse:
+    def get(
+        self,
+        url: t.Text,
+        *,
+        data: t.Optional[t.Dict[t.Any, t.Any]] = None,
+        headers: t.Optional[dt.RequestHeaders] = None,
+    ) -> ClientResponse:
         return self._make_request(dt.HTTPMethod.GET, url, data, headers)
 
-    def post(self, url: t.Text, *, data: t.Optional
-             [t.Dict[t.Any, t.Any]] = None, headers: t.Optional
-             [dt.RequestHeaders] = None) -> ClientResponse:
+    def post(
+        self,
+        url: t.Text,
+        *,
+        data: t.Optional[t.Dict[t.Any, t.Any]] = None,
+        headers: t.Optional[dt.RequestHeaders] = None,
+    ) -> ClientResponse:
         return self._make_request(dt.HTTPMethod.POST, url, data, headers)
 
-    def put(self, url: t.Text, *, data: t.Optional
-            [t.Dict[t.Any, t.Any]] = None, headers: t.Optional
-            [dt.RequestHeaders] = None) -> ClientResponse:
+    def put(
+        self,
+        url: t.Text,
+        *,
+        data: t.Optional[t.Dict[t.Any, t.Any]] = None,
+        headers: t.Optional[dt.RequestHeaders] = None,
+    ) -> ClientResponse:
         return self._make_request(dt.HTTPMethod.PUT, url, data, headers)
 
-    def patch(self, url: t.Text, *, data: t.Optional
-              [t.Dict[t.Any, t.Any]] = None, headers: t.Optional
-              [dt.RequestHeaders] = None) -> ClientResponse:
-        return self._make_request(
-            dt.HTTPMethod.PATCH, url, data, headers)
+    def patch(
+        self,
+        url: t.Text,
+        *,
+        data: t.Optional[t.Dict[t.Any, t.Any]] = None,
+        headers: t.Optional[dt.RequestHeaders] = None,
+    ) -> ClientResponse:
+        return self._make_request(dt.HTTPMethod.PATCH, url, data, headers)
 
-    def delete(self, url: t.Text, *, data: t.Optional
-               [t.Dict[t.Any, t.Any]] = None, headers: t.Optional
-               [dt.RequestHeaders] = None) -> ClientResponse:
-        return self._make_request(
-            dt.HTTPMethod.DELETE, url, data, headers)
+    def delete(
+        self,
+        url: t.Text,
+        *,
+        data: t.Optional[t.Dict[t.Any, t.Any]] = None,
+        headers: t.Optional[dt.RequestHeaders] = None,
+    ) -> ClientResponse:
+        return self._make_request(dt.HTTPMethod.DELETE, url, data, headers)
 
-    def request(self, method: t.Text, url: t.Text, *, data: t.Optional
-                [t.Dict[t.Any, t.Any]] = None, headers: t.Optional
-                [dt.RequestHeaders] = None) -> ClientResponse:
+    def request(
+        self,
+        method: t.Text,
+        url: t.Text,
+        *,
+        data: t.Optional[t.Dict[t.Any, t.Any]] = None,
+        headers: t.Optional[dt.RequestHeaders] = None,
+    ) -> ClientResponse:
         return self._make_request(dt.HTTPMethod(method), url, data, headers)
 
 
 def generate_order(
-        *, id_name: t.Text = "id", id_type: type = int, add_timestamps: bool = True,
-        created_at_key: t.Text = "createdAt", updated_at_key: t.Text = "updatedAt",
-        **kwargs: t.Any) -> Order:
-    random_number_upper_limit = 2 ** 64
+    *,
+    id_name: t.Text = "id",
+    id_type: type = int,
+    add_timestamps: bool = True,
+    created_at_key: t.Text = "createdAt",
+    updated_at_key: t.Text = "updatedAt",
+    **kwargs: t.Any,
+) -> Order:
+    random_number_upper_limit = 2**64
     order_data = {
         id_name: randint(0, random_number_upper_limit)
-        if id_type is int else str(uuid4()),
+        if id_type is int
+        else str(uuid4()),
         "orderName": f"order-{randint(0, random_number_upper_limit)}",
-        "orderNumber": randint(0, random_number_upper_limit)}
+        "orderNumber": randint(0, random_number_upper_limit),
+    }
     if add_timestamps:
         order_data[created_at_key] = str(datetime.now())
         order_data[updated_at_key] = None
