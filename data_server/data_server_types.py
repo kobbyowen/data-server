@@ -1,28 +1,28 @@
 import typing as t
 from enum import Enum
 
-JSONItem = t.Dict[t.Text, t.Any]
+JSONItem = t.Dict[str, t.Any]
 
 JSONItems = t.List[JSONItem]
 
 JSONResult = t.Union[JSONItems, JSONItem]
 
-FilterParams = t.Dict[t.Text, t.Any]
+FilterParams = t.Dict[str, t.Any]
 
-IdType = t.Union[t.Text, int]
+IdType = t.Union[str, int]
 
-ItemPath = t.List[t.Text]
+ItemPath = t.List[str]
 
-ReponseHeaders = t.Dict[t.Text, t.Text]
+ResponseHeaders = t.Dict[str, str]
 
-RequestHeaders = t.Dict[t.Text, t.Text]
+RequestHeaders = t.Dict[str, str]
 
 RouterResponse = t.Union[JSONItem, JSONItems]
 
-RequestHandler = t.Callable[[t.Text, t.Text, t.Optional
-                             [t.Dict[t.Text, t.Text]],
-                             t.Optional[JSONItem]],
-                            RouterResponse]
+RequestHandler = t.Callable[
+    [str, str, t.Optional[RequestHeaders], t.Optional[JSONItem]],
+    RouterResponse
+]
 
 
 class ResourceType(str, Enum):

@@ -23,7 +23,7 @@ def command_exists(command: t.Text) -> bool:
 class ClientResponse(t.TypedDict):
     status: int
     reason: t.Text
-    headers: dt.ReponseHeaders
+    headers: dt.ResponseHeaders
     data: bytes
     json: t.Dict[t.Any, t.Any]
 

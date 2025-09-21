@@ -33,7 +33,7 @@ class TestCSVAdapter(unittest.TestCase):
     def test_initialization_with_file_that_exists(self, os_patch: mock.MagicMock) -> None:
         with mock.patch.object(CsvAdapter, 'read_data', return_value={}) as read_data_mock:
             adapter = CsvAdapter("csv_file.csv")
-        self.assertTrue(os_patch.called_with("csv_file.csv"))
+        os_patch.assert_called_with("csv_file.csv")
         self.assertDictEqual(adapter.get_data(), {})
         self.assertTrue(read_data_mock.called)
 
@@ -57,8 +57,7 @@ class TestCSVAdapter(unittest.TestCase):
     @mock.patch("builtins.open", return_value=StringIO("id,name\n1,pius"))
     def test_read_data_with_valid_csv_file(self, open_patch: mock.MagicMock, os_patch: mock.MagicMock) -> None:
         adapter = CsvAdapter("csv_file.csv")
-        self.assertTrue(os_patch.called_with("csv_file.csv"))
-        self.assertTrue(open_patch.called_with("csv_file.csv"))
+        os_patch.assert_called_with("csv_file.csv")
         self.assertDictEqual(adapter.get_data(), {'csv_file': [{'id': '1', 'name': 'pius'}]})
 
     @mock.patch("os.path.exists", return_value=True)
@@ -68,5 +67,4 @@ class TestCSVAdapter(unittest.TestCase):
         with mock.patch.object(CsvAdapter, 'read_data', return_value={'csv_file': [{'id': '1', 'name': 'pius'}]}):
             adapter = CsvAdapter("csv_file.csv")
             adapter.save_data()
-        self.assertTrue(os_patch.called_with("csv_file.csv"))
-        self.assertTrue(open_patch.called_with("csv_file.csv"))
+        os_patch.assert_called_with("csv_file.csv")

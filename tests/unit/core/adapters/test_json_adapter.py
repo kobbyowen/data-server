@@ -22,7 +22,7 @@ class TestJSONAdapter(unittest.TestCase):
     def test_initiaization_with_file_that_exists(self, os_patch:  mock.MagicMock) -> None:
         with mock.patch.object(JSONAdapter, 'read_data', return_value={}) as read_data_mock:
             adapter = JSONAdapter("json_file.json")
-        self.assertTrue(os_patch.called_with("json_file.json"))
+        os_patch.assert_called_with("json_file.json")
         self.assertDictEqual(adapter.get_data(), {})
         self.assertTrue(read_data_mock.called)
 
@@ -30,8 +30,7 @@ class TestJSONAdapter(unittest.TestCase):
     @mock.patch("builtins.open", return_value=StringIO("{}"))
     def test_read_data_with_valid_json_file(self, open_patch:  mock.MagicMock, os_patch:  mock.MagicMock) -> None:
         adapter = JSONAdapter("json_file.json")
-        self.assertTrue(os_patch.called_with("json_file.json"))
-        self.assertTrue(open_patch.called_with("json_file.json"))
+        os_patch.assert_called_with("json_file.json")
         self.assertDictEqual(adapter.get_data(), {})
 
     @mock.patch("os.path.exists", return_value=True)
@@ -50,6 +49,6 @@ class TestJSONAdapter(unittest.TestCase):
         with mock.patch.object(JSONAdapter, 'read_data', return_value={}):
             adapter = JSONAdapter("json_file.json")
             adapter.save_data()
-        self.assertTrue(os_patch.called_with("json_file.json"))
-        self.assertTrue(open_patch.called_with("json_file.json"))
+        os_patch.assert_called_with("json_file.json")
+        open_patch.assert_called_with("json_file.json", "w")
         self.assertTrue(json_patch.called)
