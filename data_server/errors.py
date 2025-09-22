@@ -15,7 +15,7 @@ class ItemNotFoundError(DataControllerError):
         super().__init__(description, code)
 
 
-class DuplicateIDFound(DataControllerError):
+class DuplicateIDFoundError(DataControllerError):
     pass
 
 

@@ -1,9 +1,11 @@
 import os
 import warnings
-from typing import Text, Any, Dict, Optional
 from csv import DictReader, DictWriter
-from .adapter import DataAdapter
+from typing import Any, Dict, Optional
+
 from data_server.errors import CsvAdapterError
+
+from .adapter import DataAdapter
 
 
 class CsvAdapter(DataAdapter):
@@ -12,31 +14,28 @@ class CsvAdapter(DataAdapter):
     :args resource("path to a csv file or dictionary"), key("name of the csv file or key of dictionary")
     """
 
-    def __init__(
-            self, resource: Text, key: Optional[Text] = None, **kwargs: Any):
+    def __init__(self, resource: str, key: Optional[str] = None, **kwargs: Any):
         self.key = self._generate_key(resource, key)
         if not os.path.exists(resource):
-            raise CsvAdapterError(f"{resource} does not exist")
+            raise CsvAdapterError(f'{resource} does not exist')
         super().__init__(resource, **kwargs)
 
-    def read_data(self) -> Dict[Text, Any]:
+    def read_data(self) -> Dict[str, Any]:
         """
         reads csv file and returns dictionary
         :return: Dict[Text, Any]
         """
 
         if not self.resource.endswith('.csv'):
-            warnings.warn("resource must be a valid CSV file")
-        with open(self.resource, 'r') as f:
+            warnings.warn('resource must be a valid CSV file', stacklevel=1)
+        with open(self.resource) as f:
             dict_reader = DictReader(f)
             list_of_dicts = list(dict_reader)
             key_dict = dict({self.key: list_of_dicts})
             return key_dict
 
     def save_data(self) -> None:
-        assert isinstance(
-            self.read_data(),
-            dict), "resource must be a non-empty dict"
+        assert isinstance(self.read_data(), dict), 'resource must be a non-empty dict'
         data_list = self.read_data().get(self.key)
         assert data_list is not None
         keys = data_list[0].keys()
@@ -46,12 +45,12 @@ class CsvAdapter(DataAdapter):
             dict_writer.writerows(data_list)
 
     @staticmethod
-    def _generate_key(resource: Text, key: Optional[Text] = None) -> Text:
+    def _generate_key(resource: str, key: Optional[str] = None) -> str:
         if key is not None:
             return key
         return CsvAdapter._get_file_stem(resource)
 
     @staticmethod
-    def _get_file_stem(resource: Text) -> Text:
-        separator = "/" if "/" in resource else "\\"
+    def _get_file_stem(resource: str) -> str:
+        separator = '/' if '/' in resource else '\\'
         return resource.split(separator)[-1].split('.')[0]

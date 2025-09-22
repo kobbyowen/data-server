@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling>=1.17"]
+build-backend = "hatchling.build"
+
+[project]
+name = "data-server"
+version = "1.0.0"
+description = "Spin up a fake REST API from JSON/CSV with zero code."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [{name = "Maintainers"}]
+keywords = ["fake api", "mock server", "json", "csv", "rest"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Development Status :: 5 - Production/Stable"
+]
+dependencies = [
+  "Werkzeug>=2.2.2",
+  "MarkupSafe>=2.1.1"
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff>=0.6.0",
+  "mypy>=1.8.0",
+  "coverage[toml]>=7.3",
+  "build>=1.2.1",
+  "twine>=5.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/data-server"
+Issues = "https://github.com/your-org/data-server/issues"
+
+[tool.ruff]
+line-length = 120
+src = ["data_server","tests"]
+target-version = "py38"
+extend-exclude = [".venv","venv","build","dist"]
+
+[tool.ruff.lint]
+select = ["E","F","W","I","N","UP","B"]
+ignore = ["E203"]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.coverage.run]
+branch = true
+source = ["data_server"]
+
+[tool.coverage.report]
+skip_empty = true
+show_missing = true

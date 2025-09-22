@@ -1,11 +1,11 @@
-import typing as t
 import random
-from functools import reduce
+import typing as t
 from datetime import datetime
+from functools import reduce
 from uuid import uuid4
 
-from data_server.errors import ItemNotFoundError, DuplicateIDFound, DataControllerError
 import data_server.data_server_types as dt
+from data_server.errors import DataControllerError, DuplicateIDFoundError, ItemNotFoundError
 
 
 class DataController:
@@ -13,23 +13,23 @@ class DataController:
         self,
         data: t.Dict[str, t.Any],
         *,
-        id_name: str = "id",
+        id_name: str = 'id',
         fix: bool = False,
-        sort_key_param_name: str = "sort_by",
-        order_param_name: str = "order",
-        page_param_name: str = "page",
-        size_param_name: str = "size",
+        sort_key_param_name: str = 'sort_by',
+        order_param_name: str = 'order',
+        page_param_name: str = 'page',
+        size_param_name: str = 'size',
         default_page_size: int = 10,
         autogenerate_id: bool = False,
         use_timestamps: bool = False,
-        created_at_key_name: str = "created_at",
-        updated_at_key_name: str = "updated_at"
+        created_at_key_name: str = 'created_at',
+        updated_at_key_name: str = 'updated_at',
     ):
         """
         Initializes a data controller class. DataController is an abstraction that allows querying and modifying data
         which is loaded as a dictionary.
         """
-        assert isinstance(data, dict), f"data must be of type dict not {type(data)}"
+        assert isinstance(data, dict), f'data must be of type dict not {type(data)}'
         self.data = data
         self.id_name = id_name
         self.sort_key_param_name = sort_key_param_name
@@ -48,11 +48,11 @@ class DataController:
 
     def get_items(self, path: dt.ItemPath, **filters: t.Any) -> dt.JSONItems:
         items = self._get_item_by_path_only(path)
-        assert isinstance(items, list), f"Expected value for {path!r} to be a list, got {items} instead"
+        assert isinstance(items, list), f'Expected value for {path!r} to be a list, got {items} instead'
         try:
             return self._get_items(items, **filters)
-        except ValueError as e:
-            raise DataControllerError(description=e.args[0], code=400)
+        except ValueError as error:
+            raise DataControllerError(description=error.args[0], code=400) from error
 
     def get_item(self, path: dt.ItemPath, id: dt.IdType) -> dt.JSONItem:
         return self._get_item_by_path_and_id(path, id)
@@ -63,25 +63,25 @@ class DataController:
 
     def patch_item(self, path: dt.ItemPath, id: dt.IdType, new_data: dt.JSONItem) -> dt.JSONItem:
         if self.id_name in new_data:
-            raise ValueError("id cannot be patched")
+            raise ValueError('id cannot be patched')
         parent, index = self._get_item_parent_and_index(path, id)
         parent[index].update(new_data)
         return self._update_timestamps(parent[index])
 
     def replace_item(self, path: dt.ItemPath, id: dt.IdType, new_data: dt.JSONItem) -> dt.JSONItem:
         if self.id_name in new_data and new_data[self.id_name] != id:
-            raise ValueError("id cannot be replaced")
+            raise ValueError('id cannot be replaced')
         parent, index = self._get_item_parent_and_index(path, id)
         parent[index] = {**new_data, self.id_name: id}
         return self._update_timestamps(parent[index])
 
     def add_item(self, path: dt.ItemPath, new_data: dt.JSONItem) -> dt.JSONItem:
         items = self._get_item_by_path_only(path)
-        assert isinstance(items, list), f"Expected value for {path!r} to be a list, got {items} instead"
+        assert isinstance(items, list), f'Expected value for {path!r} to be a list, got {items} instead'
         data = new_data.copy()
         if not self.auto_generate_id and self.id_name in data:
             if any(item[self.id_name] == data[self.id_name] for item in items):
-                raise DuplicateIDFound(f"an item exists with same id {data[self.id_name]}", code=409)
+                raise DuplicateIDFoundError(f'an item exists with same id {data[self.id_name]}', code=409)
         if self.auto_generate_id and self.id_name not in data:
             data[self.id_name] = self._autogenerate_id(items)
         data = self._add_timestamps(data)
@@ -101,10 +101,7 @@ class DataController:
 
     @staticmethod
     def _filter_items(data: dt.JSONItems, **filters: t.Any) -> dt.JSONItems:
-        return [
-            item for item in data
-            if all(item.get(key) == value for key, value in filters.items())
-        ]
+        return [item for item in data if all(item.get(key) == value for key, value in filters.items())]
 
     def _fix_data_item(self, data: dt.JSONItem, list_data: dt.JSONItems) -> dt.JSONItem:
         data[self.id_name] = self._autogenerate_id(list_data=list_data)
@@ -121,25 +118,25 @@ class DataController:
 
     def _get_item_parent_and_index(self, path: dt.ItemPath, id: dt.IdType) -> t.Tuple[dt.JSONItems, int]:
         items = self._get_item_by_path_only(path)
-        assert isinstance(items, list), f"Expected value for {path!r} to be a list, got {items} instead"
+        assert isinstance(items, list), f'Expected value for {path!r} to be a list, got {items} instead'
         try:
             item_index = next(i for i, v in enumerate(items) if v[self.id_name] == id)
-        except StopIteration:
-            raise ItemNotFoundError(f"item with id {id} could not be resolved from path {path!r}")
+        except StopIteration as error:
+            raise ItemNotFoundError(f'item with id {id} could not be resolved from path {path!r}') from error
         return items, item_index
 
     def _get_item_by_path_only(self, path: dt.ItemPath) -> dt.JSONResult:
         try:
             return reduce(lambda prev, cur: t.cast(dt.JSONItem, prev[cur]), path, self.data)
-        except KeyError:
-            raise ItemNotFoundError(f"{path} could not be resolved in data")
+        except KeyError as error:
+            raise ItemNotFoundError(f'{path} could not be resolved in data') from error
 
     def _get_item_by_path_and_id(self, path: dt.ItemPath, id: dt.IdType) -> dt.JSONItem:
         items = self._get_item_by_path_only(path)
-        assert isinstance(items, list), f"Expected value for {path!r} to be a list, got {items} instead"
+        assert isinstance(items, list), f'Expected value for {path!r} to be a list, got {items} instead'
         filtered = [x for x in items if x[self.id_name] == id]
         if not filtered:
-            raise ItemNotFoundError(f"No item with id {id} exists")
+            raise ItemNotFoundError(f'No item with id {id} exists')
         return filtered[0]
 
     def _update_timestamps(self, item: dt.JSONItem) -> dt.JSONItem:
@@ -148,10 +145,7 @@ class DataController:
         return item
 
     def _add_timestamps(
-        self,
-        item: dt.JSONItem,
-        update_updated_at: bool = False,
-        remove_stamps: bool = False
+        self, item: dt.JSONItem, update_updated_at: bool = False, remove_stamps: bool = False
     ) -> dt.JSONItem:
         if not self.use_timestamps and remove_stamps:
             item.pop(self.created_at_key_name, None)
@@ -169,16 +163,14 @@ class DataController:
         order_enum = dt.SortOrder.ASC if order.lower() == dt.SortOrder.ASC.value else dt.SortOrder.DESC
         page = int(filters.pop(self.page_param_name, 0))
         if page < 0:
-            raise DataControllerError(
-                f"{self.page_param_name!r} should be a non negative integer, got {page}", 400)
+            raise DataControllerError(f'{self.page_param_name!r} should be a non negative integer, got {page}', 400)
         size = int(filters.pop(self.size_param_name, self.default_page_size))
         if size < 0:
-            raise DataControllerError(
-                f"{self.size_param_name!r} should be a non negative integer, got {size}", 400)
+            raise DataControllerError(f'{self.size_param_name!r} should be a non negative integer, got {size}', 400)
         filtered = self._filter_items(data, **filters)
         filtered.sort(
             key=lambda item: item.get(sort_key, list(self.data.keys())[0]),
-            reverse=order_enum == dt.SortOrder.DESC
+            reverse=order_enum == dt.SortOrder.DESC,
         )
         start_index = page * size
         end_index = start_index + size

@@ -19,30 +19,27 @@ RequestHeaders = t.Dict[str, str]
 
 RouterResponse = t.Union[JSONItem, JSONItems]
 
-RequestHandler = t.Callable[
-    [str, str, t.Optional[RequestHeaders], t.Optional[JSONItem]],
-    RouterResponse
-]
+RequestHandler = t.Callable[[str, str, t.Optional[RequestHeaders], t.Optional[JSONItem]], RouterResponse]
 
 
 class ResourceType(str, Enum):
-    JSON_FILE = "json"
-    CSV_FILE = "csv"
-    PLAIN_DICT = "dict"
+    JSON_FILE = 'json'
+    CSV_FILE = 'csv'
+    PLAIN_DICT = 'dict'
 
 
 class HTTPMethod(str, Enum):
-    GET = "GET"
-    HEAD = "HEAD"
-    POST = "POST"
-    PUT = "PUT"
-    DELETE = "DELETE"
-    CONNECT = "CONNECT"
-    OPTIONS = "OPTIONS"
-    TRACE = "TRACE"
-    PATCH = "PATCH"
+    GET = 'GET'
+    HEAD = 'HEAD'
+    POST = 'POST'
+    PUT = 'PUT'
+    DELETE = 'DELETE'
+    CONNECT = 'CONNECT'
+    OPTIONS = 'OPTIONS'
+    TRACE = 'TRACE'
+    PATCH = 'PATCH'
 
 
 class SortOrder(str, Enum):
-    ASC = "asc"
-    DESC = "desc"
+    ASC = 'asc'
+    DESC = 'desc'

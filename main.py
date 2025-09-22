@@ -1,40 +1,44 @@
 from data_server.argument_parser import ArgumentParser
-from data_server.core.server import Server
 from data_server.core.data_router import DataRouter
+from data_server.core.server import Server
 from data_server.errors import DataServerError
 
 
 def create_server() -> Server:
     parser = ArgumentParser(
-        "Data Server",
-        "Spin up a full fake REST API with no coding in less than 3 \
-                                seconds using JSON , CSV file as the source.")
+        'Data Server',
+        'Spin up a full fake REST API with no coding in less than 3 \
+                                seconds using JSON , CSV file as the source.',
+    )
 
     arguments = parser.get_parsed_arguments()
 
     request_handler = DataRouter(
-        arguments["file"],
-        id_name=arguments["id_name"],
-        sort_key_param_name=arguments["sort_param_name"],
-        order_param_name=arguments["order_param_name"],
-        page_param_name=arguments["page_param_name"],
-        size_param_name=arguments["size_param_name"],
-        autogenerate_id=arguments["auto_generate_ids"],
-        use_timestamps=arguments["use_timestamps"],
-        created_at_key_name=arguments["created_at_key_name"],
-        updated_at_key_name=arguments["updated_at_key_name"],
-        default_page_size=arguments["page_size"])
+        arguments['file'],
+        id_name=arguments['id_name'],
+        sort_key_param_name=arguments['sort_param_name'],
+        order_param_name=arguments['order_param_name'],
+        page_param_name=arguments['page_param_name'],
+        size_param_name=arguments['size_param_name'],
+        autogenerate_id=arguments['auto_generate_ids'],
+        use_timestamps=arguments['use_timestamps'],
+        created_at_key_name=arguments['created_at_key_name'],
+        updated_at_key_name=arguments['updated_at_key_name'],
+        default_page_size=arguments['page_size'],
+    )
 
-    server = Server(request_handler=request_handler,
-                    url_path_prefix=arguments["url_path_prefix"],
-                    disable_stdin=arguments["disable_stdin"],
-                    disable_logs=arguments["disable_logs"],
-                    host=arguments["host"],
-                    port=arguments["port"],
-                    static_url_prefix=arguments["static_url_prefix"],
-                    additional_headers=arguments["additional_headers"],
-                    sleep_before_request=arguments["sleep_before_request"],
-                    extra_files=[arguments["file"]])
+    server = Server(
+        request_handler=request_handler,
+        url_path_prefix=arguments['url_path_prefix'],
+        disable_stdin=arguments['disable_stdin'],
+        disable_logs=arguments['disable_logs'],
+        host=arguments['host'],
+        port=arguments['port'],
+        static_url_prefix=arguments['static_url_prefix'],
+        additional_headers=arguments['additional_headers'],
+        sleep_before_request=arguments['sleep_before_request'],
+        extra_files=[arguments['file']],
+    )
 
     return server
 
@@ -45,12 +49,14 @@ def run_server() -> None:
         server = create_server()
         server.run()
     except DataServerError as e:
-        import traceback; traceback.print_exc();
-        print(f"An error occurred({e.code!r}) | {e.description!r} ")
+        import traceback
+
+        traceback.print_exc()
+        print(f'An error occurred({e.code!r}) | {e.description!r} ')
     finally:
         if server:
             server.shutdown()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     run_server()
