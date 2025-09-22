@@ -122,7 +122,6 @@ class Server:
             status_code = 201
         elif method == dt.HTTPMethod.DELETE and not response_content:
             status_code = 204
-            response_content = ''
         else:
             status_code = 200
 

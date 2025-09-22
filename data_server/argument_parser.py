@@ -3,7 +3,7 @@ import sys
 import typing as t
 
 
-def str2bool(v):
+def str2bool(v: t.Any) -> bool:
     if isinstance(v, bool):
         return v
     if v.lower() in ('yes', 'true', 't', '1'):

@@ -14,7 +14,7 @@ class JSONAdapter(DataAdapter):
         super().__init__(resource, **kwargs)
 
     def read_data(self) -> Dict[str, Any]:
-        json_contents = {}
+        json_contents: Dict[str, Any] = {}
         with open(self.resource) as json_file:
             try:
                 json_contents = json.load(json_file)

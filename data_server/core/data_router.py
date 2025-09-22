@@ -93,7 +93,7 @@ class DataRouter:
         if method == dt.HTTPMethod.GET:
             return self._handle_http_get_request(base_url, resource_id, **query_parameters)
         if method == dt.HTTPMethod.POST:
-            result = self.data_adapter.execute_post_request(base_url, data)
+            result: dt.RouterResponse = self.data_adapter.execute_post_request(base_url, data)
             self.data_adapter.save_data()
             return result
         if method == dt.HTTPMethod.PATCH or method == dt.HTTPMethod.PUT:
