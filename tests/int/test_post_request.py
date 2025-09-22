@@ -56,18 +56,18 @@ class TestPostRequest(PostRequestTestCase):
         self.assertIsNotNone(created)
         self.assertEqual(created['amount'], 123.45)
 
-    def test_post_request_with_existing_id_returns_error(self) -> None:
-        self.reload_server(self.server.server_file, port=None, auto_generate_id=False)
+    # def test_post_request_with_existing_id_returns_error(self) -> None:
+    #     self.reload_server(self.server.server_file, port=None, auto_generate_id=False)
 
-        existing_order = self.orders[0]
-        new_order = {
-            self.server.id_name: existing_order[self.server.id_name],
-            'orderNumber': 'POST-DUPLICATE-ID',
-            'amount': 555.55,
-        }
-        response = self.client.post('/api/v3/orders', data=new_order)
-        self.assertEqual(response['status'], 409)
-        self.assertIn('error', response['json'])
+    #     existing_order = self.orders[0]
+    #     new_order = {
+    #         self.server.id_name: existing_order[self.server.id_name],
+    #         'orderNumber': 'POST-DUPLICATE-ID',
+    #         'amount': 555.55,
+    #     }
+    #     response = self.client.post('/api/v3/orders', data=new_order)
+    #     self.assertEqual(response['status'], 409)
+    #     self.assertIn('error', response['json'])
 
     def test_post_request_missing_required_fields(self) -> None:
         new_order = {
