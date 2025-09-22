@@ -1,4 +1,5 @@
 import typing as t
+import traceback
 import json
 import time
 import sys
@@ -67,6 +68,7 @@ class Server:
             return construct_error_response(
                 exception.description, exception.code, ", ".join(
                     map(str, exception.args))), exception.code, {}
+        traceback.print_exception(type(exception), exception, exception.__traceback__)
         return construct_error_response(
             ", ".join(map(str, exception.args)),
             500, None), 500, {}
@@ -96,17 +98,26 @@ class Server:
             return self._handle_options_request()
 
         query_parameters_as_dict = request.args
-        request_data = request.json if request.is_json else request.get_data(
-            as_text=True)
+        request_data = request.json if request.is_json else request.get_data(as_text=True)
         url = self.strip_url_path_prefix(request.path, self.url_path_prefix)
         try:
             response_content = self.request_handler(
-                request.method, url, query_parameters_as_dict, t.cast(
-                    dt.JSONItem, request_data))
+                request.method, url, query_parameters_as_dict, t.cast(dt.JSONItem, request_data)
+            )
         except Exception as e:
             response_content, code, headers = self._handle_error_response(e)
             return self._encode_response_content(response_content), code, headers
-        return self._encode_response_content(response_content), 200, {}
+
+        method = request.method.upper()
+        if method == dt.HTTPMethod.POST:
+            status_code = 201
+        elif method == dt.HTTPMethod.DELETE and not response_content:
+            status_code = 204
+            response_content = ""
+        else:
+            status_code = 200
+
+        return self._encode_response_content(response_content), status_code, {}
 
     def _update_headers(self, headers: dt.RequestHeaders) -> dt.RequestHeaders:
         headers.update({"Access-Control-Allow-Origin": "*"})
@@ -126,7 +137,7 @@ class Server:
 
     def _run(self) -> None:
         run_simple(
-            self.host, self.port, self, use_reloader=True,
+            self.host, self.port, self, use_reloader=False,
             reloader_interval=self.reload_interval,
             extra_files=self.extra_files)
 

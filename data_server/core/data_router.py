@@ -40,18 +40,21 @@ class DataRouter:
         # default to json adapter
         return JSONAdapter(resource, **kwargs)
 
-    def _parse_url(self, url: t.Text) -> t.Tuple[t.Text, t.Optional
-                                                 [dt.IdType]]:
+    def _parse_url(self, url: t.Text) -> t.Tuple[t.Text, t.Optional[dt.IdType]]:
         all_urls = self.data_adapter.get_urls()
         if url in all_urls:
             return url, None
         *url_base, resource_id = url.split(URL_SEPARATOR)
-        base_url = URL_SEPARATOR + URL_SEPARATOR.join(
-            url_base).strip(URL_SEPARATOR)
+        base_url = URL_SEPARATOR + URL_SEPARATOR.join(url_base).strip(URL_SEPARATOR)
         if base_url not in all_urls:
             raise ItemNotFoundError(f"{url!r} not found")
         id_type = self.data_adapter._controller.id_type or str
-        return base_url, id_type(resource_id)
+        try:
+            return base_url, id_type(resource_id)
+        except ValueError:
+            if id_type is int:
+                return base_url, -1
+            return base_url, resource_id
 
     def _handle_http_get_request(
             self, base_url: t.Text, resource_id: t.Optional[dt.IdType],
@@ -89,14 +92,19 @@ class DataRouter:
             return self._handle_http_get_request(
                 base_url, resource_id, **query_parameters)
         if method == dt.HTTPMethod.POST:
-            return self.data_adapter.execute_post_request(base_url, data)
+            result = self.data_adapter.execute_post_request(base_url, data)
+            self.data_adapter.save_data() 
+            return result
         if method == dt.HTTPMethod.PATCH or method == dt.HTTPMethod.PUT:
             assert resource_id is not None
-            return self._handle_http_update_request(
+            result = self._handle_http_update_request(
                 method, base_url, resource_id, data)
+            self.data_adapter.save_data()
+            return result
         if method == dt.HTTPMethod.DELETE:
             assert resource_id is not None
             self.data_adapter.execute_delete_request(base_url, resource_id)
+            self.data_adapter.save_data()
             return {}
         raise ValueError(f"cannot handle request for method {method!r}")
 

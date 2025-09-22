@@ -45,6 +45,7 @@ def run_server() -> None:
         server = create_server()
         server.run()
     except DataServerError as e:
+        import traceback; traceback.print_exc();
         print(f"An error occurred({e.code!r}) | {e.description!r} ")
     finally:
         if server:

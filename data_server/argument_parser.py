@@ -2,6 +2,15 @@ import argparse
 import sys
 import typing as t
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 class ArgumentParser:
     def __init__(
@@ -131,27 +140,45 @@ class ArgumentParser:
             "--id-name", default="id",
             help="The name of key for denoting the id of a resource. Defaults to %(default)s"
         )
+        # auto_generate_ids
         self._arg_parser.add_argument(
-            "--auto-generate-ids", type=bool, default=True,
+            "--auto-generate-ids", type=str2bool, nargs='?', const=True, default=True,
             help=(
                 "Determines whether ids should be auto generated or not during post request. "
-                "If not set, ids are auto generated for every post request that has no id in the request body"
+                "If not set, ids are auto generated for every post request that has no id in the request body. "
+                "Accepts true/false."
             )
         )
         self._arg_parser.add_argument(
-            "--use-timestamps", type=bool, default=True,
+            "--no-auto-generate-ids", dest="auto_generate_ids", action="store_false",
+            help="Disable auto generation of ids."
+        )
+        # use_timestamps
+        self._arg_parser.add_argument(
+            "--use-timestamps", type=str2bool, nargs='?', const=True, default=True,
             help=(
                 "Determines whether timestamps should be added during post request and modified after every change "
-                "to the resource. The names to the timestamp keys are controlled by --created-at and --updated-at key name"
+                "to the resource. The names to the timestamp keys are controlled by --created-at and --updated-at key name. "
+                "Accepts true/false."
             )
+        )
+        self._arg_parser.add_argument(
+            "--no-use-timestamps", dest="use_timestamps", action="store_false",
+            help="Disable use of timestamps."
         )
 
     def _add_hidden_arguments(self) -> None:
         self._arg_parser.add_argument(
-            "--disable-stdin", type=bool, default=False, help=argparse.SUPPRESS
+            "--disable-stdin", type=str2bool, nargs='?', const=True, default=False, help=argparse.SUPPRESS
         )
         self._arg_parser.add_argument(
-            "--disable-logs", type=bool, default=False, help=argparse.SUPPRESS
+            "--no-disable-stdin", dest="disable_stdin", action="store_false", help=argparse.SUPPRESS
+        )
+        self._arg_parser.add_argument(
+            "--disable-logs", type=str2bool, nargs='?', const=True, default=False, help=argparse.SUPPRESS
+        )
+        self._arg_parser.add_argument(
+            "--no-disable-logs", dest="disable_logs", action="store_false", help=argparse.SUPPRESS
         )
 
     @staticmethod

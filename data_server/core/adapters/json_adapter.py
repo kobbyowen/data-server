@@ -22,4 +22,4 @@ class JSONAdapter(DataAdapter):
 
     def save_data(self) -> None:
         with open(self.resource, "w") as json_file:
-            json.dump(self.get_data(), json_file)
+            json.dump(self.get_data(), json_file, indent=4, sort_keys=True)

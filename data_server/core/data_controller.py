@@ -69,7 +69,7 @@ class DataController:
         return self._update_timestamps(parent[index])
 
     def replace_item(self, path: dt.ItemPath, id: dt.IdType, new_data: dt.JSONItem) -> dt.JSONItem:
-        if self.id_name in new_data:
+        if self.id_name in new_data and new_data[self.id_name] != id:
             raise ValueError("id cannot be replaced")
         parent, index = self._get_item_parent_and_index(path, id)
         parent[index] = {**new_data, self.id_name: id}
@@ -81,7 +81,7 @@ class DataController:
         data = new_data.copy()
         if not self.auto_generate_id and self.id_name in data:
             if any(item[self.id_name] == data[self.id_name] for item in items):
-                raise DuplicateIDFound(f"an item exists with same id {data[self.id_name]}")
+                raise DuplicateIDFound(f"an item exists with same id {data[self.id_name]}", code=409)
         if self.auto_generate_id and self.id_name not in data:
             data[self.id_name] = self._autogenerate_id(items)
         data = self._add_timestamps(data)

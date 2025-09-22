@@ -24,6 +24,7 @@ class IntegrationTestCase(unittest.TestCase):
     def setUpClass(cls) -> None:
         port = random.randrange(10000, 60000)
         cls.server = TestServer(port)
+        cls.port = port 
         cls.server_file = cls.create_json_file()
         cls.server.server_file = cls.server_file
         cls.client = TestClient(port)
@@ -35,6 +36,28 @@ class IntegrationTestCase(unittest.TestCase):
     def delete_json_file(cls) -> None:
         if cls.server_file:
             os.remove(cls.server_file)
+
+    @classmethod
+    def reload_server(
+        cls,
+        server_file: t.Optional[str] = None,
+        port: t.Optional[int] = None,
+        **server_options
+    ) -> None:
+        """Stops the current server and starts a new one with the given options."""
+        if cls.server:
+            cls.server.stop()
+            time.sleep(1)
+        if port is None:
+            port = cls.port
+        if server_file is None:
+            server_file = cls.create_json_file()
+        cls.server = TestServer(port, server_file=server_file, **server_options)
+        cls.server_file = server_file
+        cls.server.server_file = server_file
+        cls.client = TestClient(port)
+        cls.server.run()
+        time.sleep(1)
 
     @classmethod
     def tearDownClass(cls) -> None:

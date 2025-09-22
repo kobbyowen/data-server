@@ -42,7 +42,7 @@ class TestServerInitialization(TestCase):
                         host="localhost", port=6000, reload_interval=20)
         server.run()
         mocked_run.assert_called_with(
-            "localhost", 6000, server, use_reloader=True, reloader_interval=20,
+            "localhost", 6000, server, use_reloader=False, reloader_interval=20,
             extra_files=[])
         server.shutdown()
 
@@ -122,7 +122,7 @@ class TestRequesthandling(TestCase):
                 self.data))
         self.assertTrue(self.response_adapter_mock.called)
         self.response_adapter_mock.assert_called_with(
-            target_response, status=200,
+            target_response, status=201,
             headers={'Access-Control-Allow-Origin': '*'},
             mimetype='application/json')
 
