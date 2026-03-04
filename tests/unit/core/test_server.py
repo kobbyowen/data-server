@@ -34,7 +34,36 @@ class TestServerInitialization(TestCase):
         server = Server(default_handler, additional_headers='', host='localhost', port=6000, reload_interval=20)
         server.run()
         mocked_run.assert_called_with(
-            'localhost', 6000, server, use_reloader=False, reloader_interval=20, extra_files=[]
+            'localhost',
+            6000,
+            server,
+            use_reloader=False,
+            reloader_interval=20,
+            extra_files=[],
+            static_files=None,
+        )
+        server.shutdown()
+
+    @patch('data_server.core.server.run_simple')
+    def test_run_with_static_folder(self, mocked_run: MagicMock) -> None:
+        server = Server(
+            default_handler,
+            additional_headers='',
+            host='localhost',
+            port=6000,
+            reload_interval=20,
+            static_folder='public',
+            static_url_prefix='assets',
+        )
+        server.run()
+        mocked_run.assert_called_with(
+            'localhost',
+            6000,
+            server,
+            use_reloader=False,
+            reloader_interval=20,
+            extra_files=[],
+            static_files={'/assets': 'public'},
         )
         server.shutdown()
 

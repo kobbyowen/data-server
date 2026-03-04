@@ -147,6 +147,11 @@ class Server:
         return response(environ, start_response)
 
     def _run(self) -> None:
+        static_files = None
+        if self.static_folder:
+            static_path = URL_SEPARATOR + self.static_url_folder.strip(URL_SEPARATOR)
+            static_files = {static_path: self.static_folder}
+
         run_simple(
             self.host,
             self.port,
@@ -154,6 +159,7 @@ class Server:
             use_reloader=False,
             reloader_interval=self.reload_interval,
             extra_files=self.extra_files,
+            static_files=static_files,
         )
 
     def run(self) -> None:

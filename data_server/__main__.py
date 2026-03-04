@@ -7,8 +7,7 @@ from data_server.errors import DataServerError
 def create_server() -> Server:
     parser = ArgumentParser(
         'Data Server',
-        'Spin up a full fake REST API with no coding in less than 3 \
-                                seconds using JSON , CSV file as the source.',
+        'Spin up a full fake REST API with no coding in less than 3 ' 'seconds using JSON , CSV file as the source.',
     )
 
     arguments = parser.get_parsed_arguments()
@@ -49,15 +48,19 @@ def run_server() -> None:
     try:
         server = create_server()
         server.run()
-    except DataServerError as e:
+    except DataServerError as error:
         import traceback
 
         traceback.print_exc()
-        print(f'An error occurred({e.code!r}) | {e.description!r} ')
+        print(f'An error occurred({error.code!r}) | {error.description!r} ')
     finally:
         if server:
             server.shutdown()
 
 
-if __name__ == '__main__':
+def main() -> None:
     run_server()
+
+
+if __name__ == '__main__':
+    main()

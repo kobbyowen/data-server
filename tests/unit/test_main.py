@@ -29,6 +29,7 @@ class TestMain(unittest.TestCase):
             'url_path_prefix': '/',
             'host': 'localhost',
             'port': 2020,
+            'static_folder': None,
             'static_url_prefix': 'static',
             'additional_headers': '',
             'sleep_before_request': 10,
