@@ -1,7 +1,7 @@
 import unittest
 from typing import Any, Dict
 
-from data_server.core.adapters.adapter import DataAdapter
+from mock_data_server.core.adapters.adapter import DataAdapter
 
 from tests.unit.fake_data import data_sample
 

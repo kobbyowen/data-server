@@ -2,15 +2,15 @@ import typing as t
 from unittest import TestCase
 from unittest.mock import patch
 
-from data_server.core.data_router import DataRouter
-from data_server.errors import ItemNotFoundError
+from mock_data_server.core.data_router import DataRouter
+from mock_data_server.errors import ItemNotFoundError
 
 
 class TestDataRouterInitialization(TestCase):
     def setUp(self) -> None:
-        adapter_patcher = patch('data_server.core.data_router.DataAdapter')
-        csv_patcher = patch('data_server.core.data_router.CsvAdapter')
-        json_adapter = patch('data_server.core.data_router.JSONAdapter')
+        adapter_patcher = patch('mock_data_server.core.data_router.DataAdapter')
+        csv_patcher = patch('mock_data_server.core.data_router.CsvAdapter')
+        json_adapter = patch('mock_data_server.core.data_router.JSONAdapter')
         self.adapter_mock = adapter_patcher.start()
         self.csv_adapter_mock = csv_patcher.start()
         self.json_adapter_mock = json_adapter.start()
@@ -51,7 +51,7 @@ class TestDataRouterForGetRequests(TestCase):
     def setUp(self) -> None:
         self.item_response = {'name': 'Kobby'}
         self.items_response = [{'name': 'Kobby'}]
-        json_adapter = patch('data_server.core.data_router.JSONAdapter')
+        json_adapter = patch('mock_data_server.core.data_router.JSONAdapter')
         self.json_adapter_mock = json_adapter.start()
         self.json_adapter_mocked_instance = self.json_adapter_mock.return_value
         self.json_adapter_mocked_instance.get_urls.return_value = [
@@ -111,7 +111,7 @@ class TestDataRouterForGetRequests(TestCase):
 class TestDataRouterPostRequest(TestCase):
     def setUp(self) -> None:
         self.item_response = {'name': 'Kobby'}
-        json_adapter = patch('data_server.core.data_router.JSONAdapter')
+        json_adapter = patch('mock_data_server.core.data_router.JSONAdapter')
         self.json_adapter_mock = json_adapter.start()
         self.json_adapter_mocked_instance = self.json_adapter_mock.return_value
         self.json_adapter_mocked_instance.get_urls.return_value = [
@@ -143,7 +143,7 @@ class TestDataRouterPostRequest(TestCase):
 class TestDataRouterPatchAndPutRequest(TestCase):
     def setUp(self) -> None:
         self.item_response = {'name': 'Kobby'}
-        json_adapter = patch('data_server.core.data_router.JSONAdapter')
+        json_adapter = patch('mock_data_server.core.data_router.JSONAdapter')
         self.json_adapter_mock = json_adapter.start()
         self.json_adapter_mocked_instance = self.json_adapter_mock.return_value
         self.json_adapter_mocked_instance.get_urls.return_value = [
@@ -183,7 +183,7 @@ class TestDataRouterPatchAndPutRequest(TestCase):
 
 class TestDataRouterDeleteRequest(TestCase):
     def setUp(self) -> None:
-        json_adapter = patch('data_server.core.data_router.JSONAdapter')
+        json_adapter = patch('mock_data_server.core.data_router.JSONAdapter')
         self.json_adapter_mock = json_adapter.start()
         self.json_adapter_mocked_instance = self.json_adapter_mock.return_value
         self.json_adapter_mocked_instance.get_urls.return_value = [
@@ -210,7 +210,7 @@ class TestDataRouterDeleteRequest(TestCase):
 
 class TestDataRouter(TestCase):
     def setUp(self) -> None:
-        json_adapter = patch('data_server.core.data_router.JSONAdapter')
+        json_adapter = patch('mock_data_server.core.data_router.JSONAdapter')
         self.json_adapter_mock = json_adapter.start()
         self.json_adapter_mocked_instance = self.json_adapter_mock.return_value
         self.json_adapter_mocked_instance.get_urls.return_value = [

@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-from data_server.errors import DataServerError
 from main import create_server, run_server
+from mock_data_server.errors import DataServerError
 
 
 class TestMain(unittest.TestCase):

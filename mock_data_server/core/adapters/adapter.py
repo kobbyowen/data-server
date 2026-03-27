@@ -1,8 +1,8 @@
 import typing as t
 from copy import deepcopy
 
-import data_server.data_server_types as dt
-from data_server.core.data_controller import DataController
+import mock_data_server.mock_data_server_types as dt
+from mock_data_server.core.data_controller import DataController
 
 
 class DataAdapter:

@@ -1,11 +1,11 @@
 import typing as t
 from pathlib import Path
 
-import data_server.data_server_types as dt
-from data_server.core.adapters.adapter import DataAdapter
-from data_server.core.adapters.csv_adapter import CsvAdapter
-from data_server.core.adapters.json_adapter import JSONAdapter
-from data_server.errors import ItemNotFoundError
+import mock_data_server.mock_data_server_types as dt
+from mock_data_server.core.adapters.adapter import DataAdapter
+from mock_data_server.core.adapters.csv_adapter import CsvAdapter
+from mock_data_server.core.adapters.json_adapter import JSONAdapter
+from mock_data_server.errors import ItemNotFoundError
 
 URL_SEPARATOR = '/'
 

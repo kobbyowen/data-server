@@ -10,8 +10,8 @@ import warnings
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Request, Response
 
-import data_server.data_server_types as dt
-from data_server.errors import DataServerError, ItemNotFoundError
+import mock_data_server.mock_data_server_types as dt
+from mock_data_server.errors import DataServerError, ItemNotFoundError
 
 URL_SEPARATOR = '/'
 

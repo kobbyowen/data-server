@@ -43,7 +43,7 @@ pip install data-server
 You can run it either as a module or a CLI command:
 
 ```bash
-python -m data_server <file>
+python -m mock_data_server <file>
 # or
 data-server <file>
 ```
@@ -202,7 +202,7 @@ ruff format .
 ruff check .
 
 # type-check
-mypy --strict data_server
+mypy --strict mock_data_server
 
 # run tests
 coverage run -m unittest discover -v -s tests

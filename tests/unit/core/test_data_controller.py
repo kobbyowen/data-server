@@ -3,9 +3,9 @@ import unittest
 from copy import deepcopy
 from unittest.mock import MagicMock, patch
 
-import data_server.data_server_types as dt
-from data_server.core.data_controller import DataController
-from data_server.errors import DataControllerError, DuplicateIDFoundError, ItemNotFoundError
+import mock_data_server.mock_data_server_types as dt
+from mock_data_server.core.data_controller import DataController
+from mock_data_server.errors import DataControllerError, DuplicateIDFoundError, ItemNotFoundError
 
 from tests.unit.fake_data import (
     data_sample,
@@ -334,7 +334,7 @@ class TestAutoGenerateId(unittest.TestCase):
         self.assertTrue(mocked_randint.called)
         self.assertEqual(generated_id, 20)
 
-    @patch('data_server.core.data_controller.uuid4', side_effect=['10', '10', '20'], return_value='20')
+    @patch('mock_data_server.core.data_controller.uuid4', side_effect=['10', '10', '20'], return_value='20')
     def test_auto_generate_string_ids(self, mocked_uuid: MagicMock) -> None:
         controller = DataController(self.data_sample_with_ints_ids, autogenerate_id=True, id_name='book_id')
         generated_id = controller._autogenerate_id(self.data_sample_with_string_ids['books'])

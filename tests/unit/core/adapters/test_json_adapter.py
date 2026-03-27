@@ -2,8 +2,8 @@ import unittest
 import unittest.mock as mock
 from io import StringIO
 
-from data_server.core.adapters.json_adapter import JSONAdapter
-from data_server.errors import AdapterError, JSONAdapterError
+from mock_data_server.core.adapters.json_adapter import JSONAdapter
+from mock_data_server.errors import AdapterError, JSONAdapterError
 
 
 class TestJSONAdapter(unittest.TestCase):

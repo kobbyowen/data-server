@@ -4,9 +4,9 @@ from io import BytesIO
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-import data_server.data_server_types as dt
-from data_server.core.server import Server
-from data_server.errors import ItemNotFoundError
+import mock_data_server.mock_data_server_types as dt
+from mock_data_server.core.server import Server
+from mock_data_server.errors import ItemNotFoundError
 from werkzeug.test import create_environ
 
 
@@ -29,7 +29,7 @@ class TestServerInitialization(TestCase):
         server = Server(default_handler, additional_headers='')
         self.assertDictEqual(server.additional_headers, {})
 
-    @patch('data_server.core.server.run_simple')
+    @patch('mock_data_server.core.server.run_simple')
     def test_run(self, mocked_run: MagicMock) -> None:
         server = Server(default_handler, additional_headers='', host='localhost', port=6000, reload_interval=20)
         server.run()
@@ -44,7 +44,7 @@ class TestServerInitialization(TestCase):
         )
         server.shutdown()
 
-    @patch('data_server.core.server.run_simple')
+    @patch('mock_data_server.core.server.run_simple')
     def test_run_with_static_folder(self, mocked_run: MagicMock) -> None:
         server = Server(
             default_handler,
@@ -67,7 +67,7 @@ class TestServerInitialization(TestCase):
         )
         server.shutdown()
 
-    @patch('data_server.core.server.logging.getLogger')
+    @patch('mock_data_server.core.server.logging.getLogger')
     def test_initialization_with_disabled_logs_and_stdin(self, mocked_logger: MagicMock) -> None:
         mocked_logger.level = 20
         mocked_logger.setLevel.return_value = None
@@ -78,7 +78,7 @@ class TestServerInitialization(TestCase):
 
 class TestRequesthandling(TestCase):
     def setUp(self) -> None:
-        response_adapter = patch('data_server.core.server.Response')
+        response_adapter = patch('mock_data_server.core.server.Response')
         self.response_adapter_mock = response_adapter.start()
         self.response_adapter_mocked_instance = self.response_adapter_mock.return_value
         self.plain_environ = create_environ(path='/books/20', method='GET')
@@ -177,7 +177,7 @@ class TestRequesthandling(TestCase):
 
 class TestErrorHandling(TestCase):
     def setUp(self) -> None:
-        response_adapter = patch('data_server.core.server.Response')
+        response_adapter = patch('mock_data_server.core.server.Response')
         self.response_adapter_mock = response_adapter.start()
         self.response_adapter_mocked_instance = self.response_adapter_mock.return_value
         self.plain_environ = create_environ(path='/books/20', method='GET')
@@ -195,7 +195,7 @@ class TestErrorHandling(TestCase):
         )
         super().setUp()
 
-    def test_data_server_errors_handling(self) -> None:
+    def test_mock_data_server_errors_handling(self) -> None:
         def handler(method: str, url: str, args: t.Any, data: t.Any) -> dt.RouterResponse:
             raise ItemNotFoundError('Not Found')
 

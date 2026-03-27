@@ -1,7 +1,7 @@
-from data_server.argument_parser import ArgumentParser
-from data_server.core.data_router import DataRouter
-from data_server.core.server import Server
-from data_server.errors import DataServerError
+from mock_data_server.argument_parser import ArgumentParser
+from mock_data_server.core.data_router import DataRouter
+from mock_data_server.core.server import Server
+from mock_data_server.errors import DataServerError
 
 
 def create_server() -> Server:

@@ -29,7 +29,7 @@ class ArgumentParser:
 
         self._arg_parser = argparse.ArgumentParser(
             prog=self.program_name,
-            usage='data_server file [options]',
+            usage='mock_data_server file [options]',
             description=self.program_description,
             epilog=self.program_epilog,
         )

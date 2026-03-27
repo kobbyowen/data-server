@@ -1,7 +1,7 @@
 import sys
 from unittest import TestCase
 
-from data_server.argument_parser import ArgumentParser
+from mock_data_server.argument_parser import ArgumentParser
 
 
 class TestArgumentParser(TestCase):

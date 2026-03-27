@@ -34,11 +34,11 @@ jobs:
 
       - name: Type check (mypy)
         run: |
-          mypy --strict data_server
+          mypy --strict mock_data_server
 
       - name: Unit tests
         run: |
-          python -m pytest tests/unit -v --cov=data_server --cov-report=term-missing
+          python -m pytest tests/unit -v --cov=mock_data_server --cov-report=term-missing
 
       - name: Integration tests
         run: |

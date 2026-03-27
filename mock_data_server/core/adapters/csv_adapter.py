@@ -3,7 +3,7 @@ import warnings
 from csv import DictReader, DictWriter
 from typing import Any, Dict, Optional
 
-from data_server.errors import CsvAdapterError
+from mock_data_server.errors import CsvAdapterError
 
 from .adapter import DataAdapter
 

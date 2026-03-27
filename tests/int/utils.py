@@ -7,7 +7,7 @@ from http.client import HTTPConnection
 from random import randint
 from uuid import uuid4
 
-import data_server.data_server_types as dt
+import mock_data_server.mock_data_server_types as dt
 
 
 class Order(t.TypedDict):

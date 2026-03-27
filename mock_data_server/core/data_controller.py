@@ -4,8 +4,8 @@ from datetime import datetime
 from functools import reduce
 from uuid import uuid4
 
-import data_server.data_server_types as dt
-from data_server.errors import DataControllerError, DuplicateIDFoundError, ItemNotFoundError
+import mock_data_server.mock_data_server_types as dt
+from mock_data_server.errors import DataControllerError, DuplicateIDFoundError, ItemNotFoundError
 
 
 class DataController:

@@ -2,7 +2,7 @@ import json
 import os
 from typing import Any, Dict
 
-from data_server.errors import AdapterError, JSONAdapterError
+from mock_data_server.errors import AdapterError, JSONAdapterError
 
 from .adapter import DataAdapter
 

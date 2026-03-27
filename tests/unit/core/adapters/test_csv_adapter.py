@@ -2,8 +2,8 @@ import unittest
 import unittest.mock as mock
 from io import StringIO
 
-from data_server.core.adapters.csv_adapter import CsvAdapter
-from data_server.errors import CsvAdapterError
+from mock_data_server.core.adapters.csv_adapter import CsvAdapter
+from mock_data_server.errors import CsvAdapterError
 
 
 class TestCSVAdapter(unittest.TestCase):
