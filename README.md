@@ -1,6 +1,6 @@
 # Data Server
 
-[![PyPI version](https://img.shields.io/pypi/v/data-server.svg)](https://pypi.org/project/mock-data-server/)
+[![PyPI version](https://img.shields.io/pypi/v/mock-data-server.svg)](https://pypi.org/project/mock-data-server/)
 
 ![demo](demo.gif)
 
@@ -38,7 +38,7 @@ Data Server reads your file, exposes routes automatically, supports CRUD for lis
 ## Installation
 
 ```bash
-pip install data-server
+pip install mock_data_server
 ```
 
 You can run it either as a module or a CLI command:
@@ -46,7 +46,7 @@ You can run it either as a module or a CLI command:
 ```bash
 python -m mock_data_server <file>
 # or
-data-server <file>
+mock-data-server <file>
 ```
 
 ---
@@ -67,7 +67,7 @@ data-server <file>
 2. Start the server:
 
 ```bash
-data-server ./todos.json --port 8000
+mock-data-server ./todos.json --port 8000
 ```
 
 3. Try requests:
@@ -142,7 +142,7 @@ You can rename these query parameter names via CLI flags such as `--page-param-n
 Usage:
 
 ```bash
-data-server <file> [options]
+mock-data-server <file> [options]
 ```
 
 Required positional argument:
