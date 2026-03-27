@@ -1,7 +1,8 @@
 # Data Server
 
-[![CI](https://github.com/your-org/data-server/actions/workflows/main-ci.yml/badge.svg)](https://github.com/your-org/data-server/actions/workflows/main-ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/data-server.svg)](https://pypi.org/project/data-server/)
+[![PyPI version](https://img.shields.io/pypi/v/data-server.svg)](https://pypi.org/project/mock-data-server/)
+
+![demo](demo.gif)
 
 Spin up a fake REST API from a JSON or CSV file with zero framework setup.
 
@@ -76,10 +77,6 @@ curl http://127.0.0.1:8000/
 curl http://127.0.0.1:8000/todos
 curl http://127.0.0.1:8000/todos/1
 ```
-
-4. See it in action:
-
-![demo](demo.gif)
 
 ---
 
