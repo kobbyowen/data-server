@@ -27,7 +27,7 @@ dependencies = [
 ]
 
 [project.scripts]
-data-server = "mock_data_server.__main__:main"
+mock-data-server = "mock_data_server.__main__:main"
 
 [project.optional-dependencies]
 dev = [
