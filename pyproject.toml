@@ -30,6 +30,8 @@ data-server = "data_server.__main__:main"
 dev = [
   "ruff>=0.6.0",
   "mypy>=1.8.0",
+  "pytest>=7.4",
+  "pytest-cov>=4.1",
   "coverage[toml]>=7.3",
   "build>=1.2.1",
   "twine>=5.0.0"
@@ -54,9 +56,21 @@ quote-style = "single"
 indent-style = "space"
 line-ending = "lf"
 
+[tool.pytest.ini_options]
+minversion = "7.4"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+  "--tb=short",
+  "-q"
+]
+
 [tool.coverage.run]
 branch = true
 source = ["data_server"]
+omit = ["tests/*"]
 
 [tool.coverage.report]
 skip_empty = true
