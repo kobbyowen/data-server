@@ -7,7 +7,7 @@ packages = ["mock_data_server"]
 
 [project]
 name = "mock-data-server"
-version = "1.0.0"
+version = "1.0.1"
 description = "Spin up a fake REST API from JSON/CSV with zero code."
 readme = "README.md"
 requires-python = ">=3.8"
