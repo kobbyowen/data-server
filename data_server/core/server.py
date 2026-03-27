@@ -147,7 +147,7 @@ class Server:
         return response(environ, start_response)
 
     def _run(self) -> None:
-        static_files = None
+        static_files: dict[str, str | tuple[str, str]] | None = None
         if self.static_folder:
             static_path = URL_SEPARATOR + self.static_url_folder.strip(URL_SEPARATOR)
             static_files = {static_path: self.static_folder}
