@@ -77,6 +77,10 @@ curl http://127.0.0.1:8000/todos
 curl http://127.0.0.1:8000/todos/1
 ```
 
+4. See it in action:
+
+![demo](demo.gif)
+
 ---
 
 ## How Routing Works
