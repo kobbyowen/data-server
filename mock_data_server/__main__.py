@@ -7,7 +7,7 @@ from mock_data_server.errors import DataServerError
 def create_server() -> Server:
     parser = ArgumentParser(
         'Data Server',
-        'Spin up a full fake REST API with no coding in less than 3 seconds using JSON , CSV file as the source.',
+        'Spin up a fully featured fake REST API in seconds from a JSON or CSV file, with no coding required.',
     )
 
     arguments = parser.get_parsed_arguments()

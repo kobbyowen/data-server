@@ -39,33 +39,34 @@ class ArgumentParser:
         self.parsed_args = self._arg_parser.parse_args(self.arguments)
 
     def _add_server_arguments(self) -> None:
-        self._arg_parser.add_argument('file', help='The path of a json or csv file to serve')
+        self._arg_parser.add_argument('file', help='Path to the JSON or CSV file to serve.')
         self._arg_parser.add_argument(
             '--host',
             default='127.0.0.1',
-            help='The host the server runs on. Defaults to %(default)s',
+            help='Host interface to bind to. Default: %(default)s.',
         )
-        self._arg_parser.add_argument('--port', default=2000, type=int, help='The server port. Defaults to %(default)s')
-        self._arg_parser.add_argument('--static-folder', help='A path to a folder to serve static files from')
+        self._arg_parser.add_argument('--port', default=2000, type=int, help='Port to listen on. Default: %(default)s.')
+        self._arg_parser.add_argument('--static-folder', help='Folder path to serve static files from.')
         self._arg_parser.add_argument(
             '--static-url-prefix',
             default='static',
-            help='The url path prefix used to serve static file',
+            help='URL prefix used when serving static files. Default: %(default)s.',
         )
         self._arg_parser.add_argument(
             '--url-path-prefix',
             default='',
             help=(
-                'A prefix that should be added to every request url. Example: using a '
-                'prefix of /api/v3/ will mean all urls paths should be prefixed by it, '
-                'http://127.0.0.1:2000/api/v3/books instead of http://127.0.0.1:2000/books'
+                'URL path prefix to prepend to every endpoint. '
+                'Example: with /api/v3, use http://127.0.0.1:2000/api/v3/books '
+                'instead of http://127.0.0.1:2000/books.'
             ),
         )
         self._arg_parser.add_argument(
             '--additional-headers',
             help=(
-                'Additional headers to add to every response. Header items are separated '
-                'by semi-colon, each key and value are separated by colon. Example: X-Limit:20;X-Range:30'
+                'Additional headers to add to every response. '
+                'Use semicolons between headers and colons between keys and values. '
+                'Example: X-Limit:20;X-Range:30.'
             ),
         )
         self._arg_parser.add_argument(
@@ -73,8 +74,8 @@ class ArgumentParser:
             default=0,
             type=int,
             help=(
-                'Number of milliseconds to wait before sending response for a request. '
-                'Can be used to test what happens to your project when a server is slow'
+                'Delay each response by this many milliseconds. '
+                'Useful for testing client behavior against slow APIs.'
             ),
         )
 
@@ -83,70 +84,63 @@ class ArgumentParser:
             '--page-size',
             default=10,
             type=int,
-            help="The default page size. Can be changed by using 'size'",
+            help='Default number of items returned per page.',
         )
         self._arg_parser.add_argument(
             '--page-param-name',
             default='page',
             help=(
-                'A url param name used to control paging. Defaults to %(default)s. '
-                "Example: if changed to 'leaf', urls will now use http:127.0.0.1/books?leaf=1 "
-                'to control pagination of resources instead of https://127.0.0.1/books?page=1. '
-                'Pages start from 0'
+                'URL query parameter name for selecting page number. Default: %(default)s. '
+                "Example: if set to 'leaf', use http://127.0.0.1/books?leaf=1. "
+                'Pages start at 0.'
             ),
         )
         self._arg_parser.add_argument(
             '--sort-param-name',
             default='sort_by',
             help=(
-                'A url param name used to control sorting. Defaults to %(default)s. '
-                "Example: if changed to 'use', urls will now use http:127.0.0.1/books?use=name "
-                "to sort resources using 'name' instead of https://127.0.0.1/books?sort_by=name. "
-                'Default sorting key is id'
+                'URL query parameter name for selecting sort field. Default: %(default)s. '
+                "Example: if set to 'use', use http://127.0.0.1/books?use=name. "
+                'Default sort field is id.'
             ),
         )
         self._arg_parser.add_argument(
             '--order-param-name',
             default='order',
             help=(
-                'A order param name used to control ordering. Defaults to %(default)s. '
-                "Example: if changed to 'arrangement', urls will now use "
-                'http:127.0.0.1/books?arrangement=asc to control pagination of resources '
-                "instead of https://127.0.0.1/books?order=asc. Order values are 'asc' and 'desc'."
+                'URL query parameter name for sort order. Default: %(default)s. '
+                "Example: if set to 'arrangement', use http://127.0.0.1/books?arrangement=asc. "
+                "Allowed values are 'asc' and 'desc'."
             ),
         )
         self._arg_parser.add_argument(
             '--size-param-name',
             default='size',
             help=(
-                'A url param name used to control the size of resource returned per request. '
-                "Defaults to %(default)s. Example: if changed to 'count', urls will now use "
-                'http:127.0.0.1/books?count=10 to control pagination of resources instead of '
-                'https://127.0.0.1/books?size=10'
+                'URL query parameter name for page size. Default: %(default)s. '
+                "Example: if set to 'count', use http://127.0.0.1/books?count=10."
             ),
         )
         self._arg_parser.add_argument(
             '--created-at-key-name',
             default='created_at',
             help=(
-                'The created at key name. Used to know which field should be updated '
-                'with timestamp when new resource is added. Defaults to %(default)s. '
-                'Can be changed to createdAt if camel case is used in your resource.'
+                'Field name used for creation timestamps on new resources. '
+                'Default: %(default)s. Use createdAt for camelCase payloads.'
             ),
         )
         self._arg_parser.add_argument(
             '--updated-at-key-name',
             default='updated_at',
             help=(
-                'The updated at key name. Used to know which field should be updated '
-                'with timestamp when resources are changed. Defaults to %(default)s. '
-                'Can be changed to updatedAt if camel case is used in your resource.'
+                'Field name used for update timestamps when resources change. '
+                'Default: %(default)s. Use updatedAt for camelCase payloads.'
             ),
         )
         self._arg_parser.add_argument(
             '--id-name',
             default='id',
-            help='The name of key for denoting the id of a resource. Defaults to %(default)s',
+            help='Field name used as the resource identifier. Default: %(default)s.',
         )
         # auto_generate_ids
         self._arg_parser.add_argument(
@@ -156,9 +150,8 @@ class ArgumentParser:
             const=True,
             default=True,
             help=(
-                'Determines whether ids should be auto generated or not during post request. '
-                'If not set, ids are auto generated for every post request that has no id in the request body. '
-                'Accepts true/false.'
+                'Whether to auto-generate IDs for POST requests missing an ID. '
+                'Default behavior is enabled. Accepts true/false.'
             ),
         )
         self._arg_parser.add_argument(
@@ -175,9 +168,9 @@ class ArgumentParser:
             const=True,
             default=True,
             help=(
-                'Determines whether timestamps should be added during post request and modified after every change '
-                'to the resource. The names to the timestamp keys are controlled by --created-at  '
-                'and --updated-at key name. Accepts true/false.'
+                'Whether to set timestamps on create and update operations. '
+                'Timestamp field names are controlled by --created-at-key-name '
+                'and --updated-at-key-name. Accepts true/false.'
             ),
         )
         self._arg_parser.add_argument(
